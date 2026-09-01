@@ -1,0 +1,40 @@
+{
+  "name": "Mairie de Bouaké",
+  "short_name": "Mairie BKÉ",
+  "description": "Site officiel de la Mairie de Bouaké — Services citoyens, actualités et projets municipaux.",
+  "lang": "fr",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#009640",
+  "background_color": "#ffffff",
+  "categories": ["government", "productivity"],
+  "screenshots": [
+    {
+      "src": "/screenshots/home-mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Page d'accueil"
+    }
+  ],
+  "icons": [
+    { "src": "/icons/icon-72x72.png", "sizes": "72x72", "type": "image/png" },
+    { "src": "/icons/icon-96x96.png", "sizes": "96x96", "type": "image/png" },
+    { "src": "/icons/icon-128x128.png", "sizes": "128x128", "type": "image/png" },
+    { "src": "/icons/icon-192x192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icons/icon-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Actualités",
+      "url": "/actualites",
+      "description": "Dernières actualités de la Mairie"
+    },
+    {
+      "name": "Mes démarches",
+      "url": "/services",
+      "description": "Accéder aux services citoyens"
+    }
+  ]
+}

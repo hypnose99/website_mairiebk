@@ -1,0 +1,81 @@
+{
+  "kind": "collectionType",
+  "collectionName": "projets",
+  "info": {
+    "singularName": "projet",
+    "pluralName": "projets",
+    "displayName": "Projet"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "titre": {
+      "type": "string",
+      "required": true
+    },
+    "resume": {
+      "type": "text"
+    },
+    "contenu": {
+      "type": "richtext"
+    },
+    "categorie": {
+      "type": "enumeration",
+      "enum": [
+        "infrastructure",
+        "social",
+        "education",
+        "sante",
+        "economie"
+      ]
+    },
+    "statut": {
+      "type": "enumeration",
+      "enum": [
+        "planifie",
+        "en-cours",
+        "termine"
+      ]
+    },
+    "budget": {
+      "type": "string"
+    },
+    "dateDebut": {
+      "type": "date"
+    },
+    "dateFin": {
+      "type": "date"
+    },
+    "maitreOuvrage": {
+      "type": "string"
+    },
+    "bailleur": {
+      "type": "string"
+    },
+    "progression": {
+      "type": "integer"
+    },
+    "coverImageUrl": {
+      "type": "string"
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "galerie": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "featured": {
+      "type": "boolean"
+    }
+  }
+}

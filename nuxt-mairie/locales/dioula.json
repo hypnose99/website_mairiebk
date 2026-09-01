@@ -1,0 +1,42 @@
+{
+  "nav": {
+    "accueil": "So-kɔnɔ",
+    "elus": "Dugutigi ni a cɛmancow",
+    "services": "Baara kɛtɔw",
+    "projets": "Kabakow",
+    "actualites": "Kunnafoniw",
+    "opportunites": "Nafaw",
+    "ariaLabel": "Yɔrɔdimi jɛnkolonw",
+    "mobileAriaLabel": "Portable yɔrɔdimi",
+    "open": "Yɔrɔdimi tɛmɛ",
+    "close": "Yɔrɔdimi datugu"
+  },
+  "header": {
+    "logoAlt": "Bouaké Dugumuso logo"
+  },
+  "footer": {
+    "description": "Bouaké dugumuso ka weburuki dafalen, Côte d'Ivoire.",
+    "quickLinks": "Gafe surun",
+    "contact": "Bɛɛ lajɛ",
+    "rights": "Bouaké Dugumuso — Haki bɛɛ fɔlɔ."
+  },
+  "home": {
+    "upcomingEvents": "Sena cogoyaw",
+    "flashInfo": "Kunnafoni Gɛlɛn",
+    "cityTitle": "Bouaké hakɛw",
+    "latestNews": "Kunnafoni kɔrɔw",
+    "quickServices": "Gafe surun"
+  },
+  "common": {
+    "seeAll": "A bɛɛ lajɛ",
+    "loading": "A b'a lajɛ...",
+    "error": "Fili dɔ kɛra.",
+    "backToHome": "So-kɔnɔ kɔ segin",
+    "learnMore": "A ɲɛ fara"
+  },
+  "pwa": {
+    "updateAvailable": "Kura dɔ b'a la. I ye refresh kɛ.",
+    "offlineReady": "Weburuki bɛ sɔrɔ internet nkɔ.",
+    "install": "App sɔrɔ"
+  }
+}

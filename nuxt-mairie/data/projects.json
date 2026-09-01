@@ -1,0 +1,77 @@
+[
+  {
+    "id": "grand-marche-central",
+    "slug": "grand-marche-central",
+    "title": "Reconstruction du Grand Marché Central",
+    "description": "Ce projet majeur vise à doter Bouaké du plus grand marché de gros et de détail d'Afrique de l'Ouest. Le nouveau bâtiment sera entièrement sécurisé contre les incendies et disposera d'une zone logistique moderne.",
+    "maitreOuvrage": "Mairie de Bouaké",
+    "financement": "Banque Mondiale & État de CI",
+    "entreprises": "SOGEA SATOM / PFO Africa",
+    "livraisonPrevue": "Décembre 2026",
+    "progressPercent": 75,
+    "status": "en_cours",
+    "tags": ["commerce", "infrastructure", "modernisation"],
+    "images": [
+      {
+        "src": "https://images.unsplash.com/photo-1541888062-8149eb7fb749?auto=format&fit=crop&w=1000&q=80",
+        "alt": "Chantier Grand Marché - Vue générale",
+        "caption": "Vue générale du chantier"
+      },
+      {
+        "src": "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1000&q=80",
+        "alt": "Structure métallique",
+        "caption": "Structure métallique en cours"
+      },
+      {
+        "src": "https://images.unsplash.com/photo-1581094288338-2314dddb7ece?auto=format&fit=crop&w=1000&q=80",
+        "alt": "Travaux intérieurs",
+        "caption": "Travaux intérieurs"
+      },
+      {
+        "src": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1000&q=80",
+        "alt": "Zone logistique",
+        "caption": "Zone logistique"
+      },
+      {
+        "src": "https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?auto=format&fit=crop&w=1000&q=80",
+        "alt": "Façade principale",
+        "caption": "Façade principale"
+      }
+    ]
+  },
+  {
+    "id": "bitumage-voirie",
+    "slug": "bitumage-voirie-urbaine",
+    "title": "Bitumage de 50km de voirie urbaine",
+    "description": "Désenclavement des quartiers périphériques et amélioration de la fluidité routière dans le centre-ville. Le projet inclut également la création de caniveaux couverts pour résoudre le problème des inondations.",
+    "maitreOuvrage": "AGEROUTE CI",
+    "financement": "Banque Africaine de Dév. (BAD)",
+    "entreprises": "COLAS Afrique",
+    "livraisonPrevue": "Août 2026",
+    "progressPercent": 45,
+    "status": "en_cours",
+    "tags": ["voirie", "transport", "désenclavement"],
+    "images": [
+      {
+        "src": "https://images.unsplash.com/photo-1573108724029-4c46571d6490?auto=format&fit=crop&w=1000&q=80",
+        "alt": "Pose de bitume",
+        "caption": "Pose de bitume"
+      },
+      {
+        "src": "https://images.unsplash.com/photo-1584464457692-02c3886915ab?auto=format&fit=crop&w=1000&q=80",
+        "alt": "Caniveaux",
+        "caption": "Construction des caniveaux"
+      },
+      {
+        "src": "https://images.unsplash.com/photo-1563200788-2993881c1fb5?auto=format&fit=crop&w=1000&q=80",
+        "alt": "Route terminée",
+        "caption": "Section terminée"
+      },
+      {
+        "src": "https://images.unsplash.com/photo-1618172193622-ae2d025f4032?auto=format&fit=crop&w=1000&q=80",
+        "alt": "Matériel de chantier",
+        "caption": "Matériel de chantier"
+      }
+    ]
+  }
+]

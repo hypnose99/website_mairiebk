@@ -1,0 +1,156 @@
+{
+  "maire": {
+    "id": "amadou-kone",
+    "firstName": "Amadou",
+    "lastName": "KONÉ",
+    "photo": "/images/amadou-kone.jpg",
+    "photoAlt": "Amadou Koné, Maire de Bouaké",
+    "party": "RHDP",
+    "since": "2023-09-01",
+    "bio": "Amadou Koné est élu à la tête de la municipalité de Bouaké avec la liste « Bouaké Nouveau ». Ministre des Transports depuis 2017 et Député de la circonscription, il engage une vaste politique de modernisation des infrastructures et de cohésion sociale.",
+    "timeline": [
+      {
+        "period": "Depuis Septembre 2023",
+        "title": "Maire de la commune de Bouaké",
+        "description": "Élu à la tête de la municipalité avec la liste « Bouaké Nouveau ». Il engage une vaste politique de modernisation des infrastructures et de cohésion sociale au sein de la capitale du Gbêkê."
+      },
+      {
+        "period": "2021 - Aujourd'hui",
+        "title": "Député de Bouaké commune",
+        "description": "Représentant de la circonscription à l'Assemblée Nationale de Côte d'Ivoire."
+      },
+      {
+        "period": "2017 - Actuel",
+        "title": "Ministre des Transports",
+        "description": "En charge de la politique gouvernementale de la République de Côte d'Ivoire en matière de transport terrestre, aérien et maritime."
+      },
+      {
+        "period": "Période précédente",
+        "title": "Membre du Conseil Régional",
+        "description": "Élu membre du conseil régional de la Vallée du Bandama, participant activement au développement de la région."
+      }
+    ],
+    "representations": [
+      "Président de l'Union des Villes et Communes de Côte d'Ivoire (UVICOCI)",
+      "Membre de la Commission consultative des services publics locaux"
+    ],
+    "documents": [
+      {
+        "id": "patrimoine",
+        "label": "Déclaration de situation patrimoniale",
+        "icon": "📄",
+        "linkLabel": "Télécharger le PDF",
+        "href": "#"
+      },
+      {
+        "id": "interets",
+        "label": "Déclaration d'intérêts",
+        "icon": "📄",
+        "linkLabel": "Télécharger le PDF",
+        "href": "#"
+      },
+      {
+        "id": "cadeaux",
+        "label": "Cadeaux et invitations (2023)",
+        "icon": "🗓️",
+        "linkLabel": "A déclaré n'avoir rien reçu",
+        "href": "#"
+      }
+    ]
+  },
+  "adjoints": [
+    {
+      "id": "paul-dakuyo",
+      "rank": 1,
+      "firstName": "PAUL",
+      "lastName": "DAKUYO",
+      "photo": "/images/1er.jpeg",
+      "attributions": [
+        "Coordination de l'action municipale",
+        "Administration générale",
+        "Ressources Humaines",
+        "Finances et Budget",
+        "État civil et Population",
+        "Relations institutionnelles",
+        "Sécurité urbaine",
+        "Suivi des grands projets"
+      ]
+    },
+    {
+      "id": "jacqueline-nguessan",
+      "rank": 2,
+      "firstName": "JACQUELINE",
+      "lastName": "N'GUESSAN",
+      "photo": "/images/2eme.jpeg",
+      "attributions": [
+        "Urbanisme et Habitat",
+        "Permis de construire",
+        "Domaine et foncier",
+        "Cadre de vie",
+        "Hygiène et Assainissement",
+        "Environnement",
+        "Espaces verts",
+        "Gestion des déchets"
+      ]
+    },
+    {
+      "id": "silue-pegabila",
+      "rank": 3,
+      "firstName": "SILUE",
+      "lastName": "PEGABILA",
+      "photo": "/images/3eme.jpeg",
+      "attributions": [
+        "Éducation et Enseignement",
+        "Vie scolaire",
+        "Petite enfance",
+        "Jeunesse et Insertion",
+        "Formation professionnelle",
+        "Bibliothèques municipales",
+        "Cantines scolaires",
+        "Alphabétisation"
+      ]
+    },
+    {
+      "id": "diaby-peter",
+      "rank": 4,
+      "firstName": "DIABY",
+      "lastName": "PETER",
+      "photo": "/images/4eme.jpeg",
+      "attributions": [
+        "Culture et Patrimoine",
+        "Sports et Loisirs",
+        "Tourisme local",
+        "Fêtes et cérémonies",
+        "Communication et Médias"
+      ]
+    },
+    {
+      "id": "fanta-ouattara",
+      "rank": 5,
+      "firstName": "FANTA",
+      "lastName": "OUATTARA",
+      "photo": "/images/5.jpeg",
+      "attributions": [
+        "Social et Solidarité",
+        "Affaires sociales",
+        "Insertion professionnelle",
+        "Handicap et dépendance",
+        "Associations et bénévolat"
+      ]
+    },
+    {
+      "id": "diop",
+      "rank": 6,
+      "firstName": "",
+      "lastName": "DIOP",
+      "photo": "/images/6eme.jpeg",
+      "attributions": [
+        "Économie numérique",
+        "Innovation et Startups",
+        "Transition écologique",
+        "Énergies renouvelables",
+        "Coopération décentralisée"
+      ]
+    }
+  ]
+}

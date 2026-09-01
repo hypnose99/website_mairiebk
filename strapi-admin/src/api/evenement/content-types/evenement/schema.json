@@ -1,0 +1,58 @@
+{
+  "kind": "collectionType",
+  "collectionName": "evenements",
+  "info": {
+    "singularName": "evenement",
+    "pluralName": "evenements",
+    "displayName": "Evenement"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "titre": {
+      "type": "string"
+    },
+    "description": {
+      "type": "text"
+    },
+    "contenu": {
+      "type": "richtext"
+    },
+    "dateDebut": {
+      "type": "datetime"
+    },
+    "dateFin": {
+      "type": "date"
+    },
+    "lieu": {
+      "type": "text"
+    },
+    "categorie": {
+      "type": "enumeration",
+      "enum": [
+        "culturel",
+        "sportif",
+        "politique",
+        "social"
+      ]
+    },
+    "coverImageUrl": {
+      "type": "string"
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "featured": {
+      "type": "boolean"
+    }
+  }
+}

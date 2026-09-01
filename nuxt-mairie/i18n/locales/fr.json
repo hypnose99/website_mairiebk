@@ -1,0 +1,42 @@
+{
+  "nav": {
+    "accueil": "Accueil",
+    "elus": "Municipalité",
+    "services": "Services",
+    "projets": "Projets",
+    "actualites": "Actualités",
+    "opportunites": "Opportunités",
+    "ariaLabel": "Navigation principale",
+    "mobileAriaLabel": "Navigation mobile",
+    "open": "Ouvrir le menu",
+    "close": "Fermer le menu"
+  },
+  "header": {
+    "logoAlt": "Logo de la Mairie de Bouaké"
+  },
+  "footer": {
+    "description": "Site officiel de la Mairie de Bouaké, capitale du Gbêkê, Côte d'Ivoire.",
+    "quickLinks": "Liens rapides",
+    "contact": "Contact",
+    "rights": "Mairie de Bouaké — Tous droits réservés."
+  },
+  "home": {
+    "upcomingEvents": "Événements à venir",
+    "flashInfo": "Flash Infos",
+    "cityTitle": "Bouaké en chiffres",
+    "latestNews": "Dernières actualités",
+    "quickServices": "Accès rapide"
+  },
+  "common": {
+    "seeAll": "Voir tout",
+    "loading": "Chargement...",
+    "error": "Une erreur est survenue.",
+    "backToHome": "Retour à l'accueil",
+    "learnMore": "En savoir plus"
+  },
+  "pwa": {
+    "updateAvailable": "Une mise à jour est disponible. Cliquez pour rafraîchir.",
+    "offlineReady": "Le site est disponible hors ligne.",
+    "install": "Installer l'application"
+  }
+}

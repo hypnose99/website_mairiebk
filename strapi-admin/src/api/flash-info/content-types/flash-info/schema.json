@@ -1,0 +1,34 @@
+{
+  "kind": "collectionType",
+  "collectionName": "flash_infos",
+  "info": {
+    "singularName": "flash-info",
+    "pluralName": "flash-infos",
+    "displayName": "FlashInfo"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "titre": {
+      "type": "string",
+      "required": true
+    },
+    "contenu": {
+      "type": "text"
+    },
+    "type": {
+      "type": "enumeration",
+      "enum": [
+        "info",
+        "travaux",
+        "alerte",
+        "urgent"
+      ]
+    },
+    "actif": {
+      "type": "boolean"
+    }
+  }
+}
