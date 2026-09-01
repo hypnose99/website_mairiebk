@@ -1,0 +1,65 @@
+# ─── Fichiers system ─────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.env.local
+.env.*.local
+
+# ─── Node & npm ───────────────────────────────────────────────
+node_modules/
+dist/
+build/
+*.npm
+*.yarn
+.npm
+.yarn
+
+# ─── Nuxt ─────────────────────────────────────────────────────
+.nuxt/
+.output/
+.env
+.env.*.local
+
+# ─── Strapi ───────────────────────────────────────────────────
+.strapi
+.strapi/
+
+# ─── IDE ──────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.iml
+
+# ─── Fichiers Legacy (statiques HTML non utilisés) ──────────────
+# Les fichiers HTML de la racine sont des prototypes heritage
+# Le projet actif est: nuxt-mairie/ + strapi-admin/
+index.html
+article.html
+services.html
+projets.html
+maire.html
+elus.html
+script.js
+style.css
+images/
+
+# ─── Logs ─────────────────────────────────────────────────────
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ─── Database ─────────────────────────────────────────────────
+*.db
+*.sqlite
+*.sqlite3
+
+# ─── Misc ─────────────────────────────────────────────────────
+.cache/
+.turbo/
+dist/
+coverage/

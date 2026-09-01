@@ -1,476 +1,420 @@
-# Projet Mairie de Bouaké — Documentation de reprise
+# Mairie de Bouaké — Documentation technique du projet
 
-Ce dépôt contient deux éléments principaux :
+## 1. Présentation générale
 
-- un site public moderne basé sur Nuxt 3 dans le dossier `nuxt-mairie/`
-- un back-office CMS Strapi 5 dans le dossier `strapi-admin/`
-- un ensemble de fichiers HTML statiques à la racine, hérités du prototype initial et non utilisés comme source de vérité principale du projet actuel
+Ce projet est une application web pour la mairie de Bouaké qui sépare clairement les responsabilités entre :
 
-Le projet est un site institutionnel de la Mairie de Bouaké (Côte d’Ivoire), avec des pages d’information, des actualités, des projets, des élus, des services citoyens, et un système de contenu éditable via Strapi.
+- un front-office Nuxt 3 pour l’affichage public,
+- un CMS Strapi 5 pour l’édition des contenus,
+- une base PostgreSQL hébergée via Supabase pour les données structurées,
+- Cloudinary pour le stockage et le CDN des images et médias,
+- un ensemble de fichiers statiques hérités à la racine, qui ne sont pas la source de vérité du projet actif.
 
----
+Le site public sert à informer les citoyens sur :
 
-## 1. Vue d’ensemble du projet
-
-### Objectif
-Le site vise à présenter :
-- l’identité et les institutions de la commune,
-- les actualités et la communication locale,
-- les projets municipaux,
-- les services administratifs pour les citoyens,
-- les élus et leurs responsabilités,
-- un accès multilingue (français + dioula).
-
-### Architecture générale
-
-```
-mairieaccueil/
-├── README.md                  # Documentation de reprise
-├── index.html                 # Prototype statique historique
-├── article.html               # Prototype statique historique
-├── services.html              # Prototype statique historique
-├── projets.html               # Prototype statique historique
-├── maire.html                 # Prototype statique historique
-├── elus.html                  # Prototype statique historique
-├── script.js                  # Script JS historique
-├── style.css                  # CSS historique
-├── images/                    # Images de l'ancien prototype
-│
-├── nuxt-mairie/               # Frontend actif principal
-│   ├── app.vue
-│   ├── nuxt.config.ts
-│   ├── package.json
-│   ├── .env.example
-│   ├── assets/
-│   ├── components/
-│   ├── composables/
-│   ├── data/
-│   ├── i18n/
-│   ├── layouts/
-│   ├── locales/
-│   ├── pages/
-│   ├── plugins/
-│   ├── public/
-│   ├── server/
-│   ├── stores/
-│   ├── types/
-│   └── utils/
-│
-└── strapi-admin/              # CMS backend actif
-    ├── package.json
-    ├── config/
-    ├── src/
-    ├── public/
-    ├── database/
-    └── ...
-```
-
-### Rôle des deux applications
-
-- `nuxt-mairie/` : site public visible par les visiteurs, construit avec Nuxt 3.
-- `strapi-admin/` : CMS qui stocke les contenus éditables (actualités, projets, événements, flash infos, etc.).
-
-Le frontend consomme l’API Strapi pour afficher les contenus dynamiques. En cas d’indisponibilité du CMS, il peut basculer sur des données JSON locales dans `nuxt-mairie/data/`.
+- les actualités et communiqués,
+- les projets de la ville,
+- les services administratifs,
+- les élus,
+- les événements,
+- les opportunités et initiatives locales.
 
 ---
 
-## 2. Stack technique
+## 2. Architecture globale
 
-### Frontend Nuxt
-- Nuxt 3
-- Vue 3
-- TypeScript
-- Pinia
-- Bootstrap 5
-- Bootstrap Icons
-- @nuxtjs/i18n pour la traduction FR / Dioula
-- SSR + rendu statique selon les routes
+### 2.1 Rôle de chaque couche
 
-### Backend Strapi
-- Strapi 5
-- PostgreSQL (configuration prévue dans `strapi-admin/config/database.js`)
-- API REST / content-types personnalisés
-- Gestion des médias et contenus éditoriaux via interface d’administration
+#### Nuxt 3 / front public
+C’est la couche d’affichage. Elle rassemble :
 
-### Points d’entrée des scripts
+- les pages du site,
+- les composants réutilisables,
+- les styles,
+- la logique d’appel API,
+- la gestion de l’internationalisation,
+- le routage front.
 
-Fichier `nuxt-mairie/package.json` :
+Le projet Nuxt est dans le dossier [nuxt-mairie](nuxt-mairie).
 
-```json
-{
-  "scripts": {
-    "dev": "nuxt dev",
-    "build": "nuxt build",
-    "generate": "nuxt generate",
-    "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
-  }
-}
-```
+#### Strapi 5 / CMS
+Strapi est la couche éditoriale. Il permet à l’équipe de la mairie de :
 
-Fichier `strapi-admin/package.json` :
+- créer et modifier des actualités,
+- gérer les projets,
+- publier des événements,
+- alimenter les contenus textuels, images et galeries,
+- exposer ces contenus via son API.
 
-```json
-{
-  "scripts": {
-    "dev": "strapi develop",
-    "build": "strapi build",
-    "start": "strapi start",
-    "strapi": "strapi"
-  }
-}
-```
+Le backend est dans le dossier [strapi-admin](strapi-admin).
 
----
+#### Supabase / base de données
+Supabase héberge la base PostgreSQL utilisée par Strapi. C’est là que les contenus structurés sont enregistrés.
 
-## 3. Prérequis
+En pratique :
 
-### Frontend
-- Node.js >= 20
-- npm
+- Strapi gère la structure de contenu,
+- Supabase stocke les données en base,
+- Nuxt ne parle pas directement à Supabase pour l’affichage public,
+- Nuxt parle à l’API Strapi.
 
-### Backend Strapi
-- Node.js >= 20
-- PostgreSQL local ou distant
-- Variables d’environnement configurées
+#### Cloudinary / médias
+Cloudinary sert au stockage des images et médias. Les images sont envoyées dans le cloud, puis Strapi référence ces fichiers. Cela évite de stocker des fichiers lourds dans la base PostgreSQL.
 
-> Le projet est construit pour des environnements Node 20+ et Strapi 5. Il est recommandé de rester sur une version Node compatible avec cette stack.
+En résumé :
+
+- Supabase = données structurées,
+- Cloudinary = fichiers multimédias,
+- Strapi = interface d’édition + API,
+- Nuxt = affichage public.
 
 ---
 
-## 4. Démarrage du projet
+## 3. Découpage du projet
 
-### 4.1 Installer les dépendances
+### 3.1 Racine du projet
+La racine contient des fichiers legacy comme :
 
-#### Frontend
-```bash
-cd nuxt-mairie
-npm install
-```
+- index.html
+- article.html
+- services.html
+- projets.html
+- maire.html
+- elus.html
+- script.js
+- style.css
 
-#### Backend
-```bash
-cd strapi-admin
-npm install
-```
+Ces fichiers sont hérités du premier prototype. Ils ne sont pas la source de vérité du projet actuel. Le site actif est le front Nuxt + le CMS Strapi.
 
-### 4.2 Démarrer le frontend
-```bash
-cd nuxt-mairie
-npm run dev
-```
+### 3.2 Dossier Nuxt
+Le dossier [nuxt-mairie](nuxt-mairie) contient tout le front public.
 
-Puis ouvrir :
-- http://localhost:3000
+Ses sous-dossiers sont structurés par rôle :
 
-### 4.3 Démarrer le CMS Strapi
-```bash
-cd strapi-admin
-npm run develop
-```
+- [nuxt-mairie/pages](nuxt-mairie/pages) : routes de l’application,
+- [nuxt-mairie/components](nuxt-mairie/components) : composants UI,
+- [nuxt-mairie/components/layout](nuxt-mairie/components/layout) : header, footer, navigation,
+- [nuxt-mairie/components/home](nuxt-mairie/components/home) : sections de la page d’accueil,
+- [nuxt-mairie/components/ui](nuxt-mairie/components/ui) : composants génériques,
+- [nuxt-mairie/server/api](nuxt-mairie/server/api) : routes serveur qui appellent Strapi,
+- [nuxt-mairie/server/utils](nuxt-mairie/server/utils) : utilitaires de transformation des données,
+- [nuxt-mairie/composables](nuxt-mairie/composables) : logique réutilisable pour les données,
+- [nuxt-mairie/stores](nuxt-mairie/stores) : état global Pinia,
+- [nuxt-mairie/data](nuxt-mairie/data) : données locales de secours,
+- [nuxt-mairie/locales](nuxt-mairie/locales) : fichiers de traduction,
+- [nuxt-mairie/public](nuxt-mairie/public) : fichiers publics statiques comme les images du site,
+- [nuxt-mairie/nuxt.config.ts](nuxt-mairie/nuxt.config.ts) : config Nuxt, i18n, runtime config, CSS, plugins.
 
-Puis ouvrir :
-- http://localhost:1337/admin
+### 3.3 Dossier Strapi
+Le dossier [strapi-admin](strapi-admin) contient le CMS.
 
-### 4.4 Build de production
+Il contient :
 
-Frontend :
-```bash
-cd nuxt-mairie
-npm run build
-npm run preview
-```
-
-Backend :
-```bash
-cd strapi-admin
-npm run build
-npm run start
-```
+- [strapi-admin/src/api](strapi-admin/src/api) : content-types personnalisés pour les actualités, projets, événements, etc.,
+- [strapi-admin/config](strapi-admin/config) : configuration serveur, base de données, plugins, admin,
+- [strapi-admin/public](strapi-admin/public) : ressources publiques du CMS,
+- [strapi-admin/import-actualites.js](strapi-admin/import-actualites.js) : script d’import des actualités,
+- [strapi-admin/import-projets.js](strapi-admin/import-projets.js) : script d’import des projets,
+- [strapi-admin/import-evenements.js](strapi-admin/import-evenements.js) : script d’import des événements,
+- [strapi-admin/update-images.js](strapi-admin/update-images.js) : migration / mise à jour des images.
 
 ---
 
-## 5. Configuration de l’environnement
+## 4. Rôles du front-end Nuxt
 
-### Frontend : `nuxt-mairie/.env.example`
+### 4.1 Fichiers de configuration
+Le fichier [nuxt-mairie/nuxt.config.ts](nuxt-mairie/nuxt.config.ts) centralise :
 
-Ce fichier contient les variables principales attendues par Nuxt :
+- le SSR,
+- les modules Nuxt,
+- les traductions i18n,
+- le CSS global,
+- le runtime config,
+- la configuration Strapi et le site public.
 
-```env
-SITE_URL=https://mairie-bouake.ci
-API_BASE=/api
-API_SECRET_KEY=changez_cette_valeur_en_production
-ANALYTICS_ID=
-NODE_ENV=development
-```
+Il définit notamment :
 
-Le fichier `nuxt.config.ts` configure également :
-- SSR actif,
-- modules Pinia + i18n,
-- CSS global Bootstrap + styles internes,
-- runtimeConfig avec `strapiUrl`, `strapiToken`, `siteUrl`, etc.
+- les locales FR et Dioula,
+- le CSS Bootstrap et les styles propres,
+- les variables runtime comme STRAPI_URL et STRAPI_TOKEN.
 
-### Backend : Strapi
-Configuration de la base de données dans :
-- `strapi-admin/config/database.js`
+### 4.2 Gestion du routage
+Nuxt utilise le système de routage basé sur le dossier [nuxt-mairie/pages](nuxt-mairie/pages).
 
-Le projet utilise PostgreSQL avec des valeurs par défaut :
-- host: `localhost`
-- port: `5432`
-- database: `strapi`
-- user: `strapi`
-- password: `strapi`
+Les pages principales sont :
 
-Il faut éventuellement créer la base avant de lancer Strapi.
+- [nuxt-mairie/pages/index.vue](nuxt-mairie/pages/index.vue) : page d’accueil
+- [nuxt-mairie/pages/services.vue](nuxt-mairie/pages/services.vue) : services et démarches
+- [nuxt-mairie/pages/elus.vue](nuxt-mairie/pages/elus.vue) : élus et personnalités
+- [nuxt-mairie/pages/projets.vue](nuxt-mairie/pages/projets.vue) : projets municipaux
+- [nuxt-mairie/pages/actualites/index.vue](nuxt-mairie/pages/actualites/index.vue) : liste des actualités
+- [nuxt-mairie/pages/actualites/[slug].vue](nuxt-mairie/pages/actualites/[slug].vue) : page détail d’un article
+- [nuxt-mairie/pages/opportunites.vue](nuxt-mairie/pages/opportunites.vue) : opportunités et développement local
 
----
+### 4.3 Navigation du site
+La navigation principale est gérée par [nuxt-mairie/components/layout/AppHeader.vue](nuxt-mairie/components/layout/AppHeader.vue).
 
-## 6. Structure du frontend Nuxt
+Ce composant :
 
-### Fichier principal
-- `nuxt-mairie/app.vue` : point d’entrée global, affiche les notifications et la bannière hors ligne.
-- `nuxt-mairie/nuxt.config.ts` : configuration du projet, i18n, CSS, runtime config, plugins.
+- affiche le logo,
+- construit le menu principal,
+- gère les liens vers les pages,
+- charge le sélecteur de langue,
+- gère le menu mobile,
+- met à jour l’état du menu selon la route actuelle.
 
-### Pages
-Les pages principales sont dans `nuxt-mairie/pages/` :
-
-- `index.vue` : page d’accueil
-- `services.vue` : services aux citoyens
-- `elus.vue` : élus et mairies
-- `projets.vue` : projets municipaux
-- `actualites/index.vue` : liste des actualités
-- `actualites/[slug].vue` : détail d’un article
-- `opportunites.vue` : opportunités / développement local
-
-### Composants
-Le dossier `components/` est organisé par rôle :
-
-- `components/layout/`
-  - `AppHeader.vue`
-  - `AppFooter.vue`
-- `components/ui/`
-  - `FlipCard.vue`
-  - `NewsCard.vue`
-  - `ProjectCard.vue`
-  - `ProjectModal.vue`
-  - `ServiceAccordion.vue`
-- `components/home/`
-  - `ActualitesSection.vue`
-  - `CitoyenForm.vue`
-  - `CityChart.vue`
-  - `EventCarousel.vue`
-  - `FlashInfo.vue`
-  - `PostDuJour.vue`
-  - `ProjetsSection.vue`
-  - `QueFaireSection.vue`
-
-### Données et logique métier
-- `data/actualites.json` : données d’actualités locales
-- `data/projects.json` : données de projets locales
-- `data/elus.json` : données des élus locales
-- `composables/useActualites.ts` : logique de chargement des actualités
-- `composables/useProjects.ts` : logique de chargement des projets
-- `composables/useElus.ts` : logique de chargement des élus
-- `stores/useAppStore.ts` : store Pinia global pour l’état UI et notifications
-- `types/index.ts` : interfaces TypeScript du domaine
-
-### API côté Nuxt
-Les routes API de serveur sont dans `nuxt-mairie/server/api/` :
-
-- `actualites.get.ts`
-- `projects.get.ts`
-- `elus.get.ts`
-- `evenements.get.ts`
-- `flash-info.get.ts`
-- `actualites/[slug].get.ts`
-
-Les transformations Strapi → format Nuxt sont centralisées dans :
-- `nuxt-mairie/server/utils/strapi.ts`
-
-### Internationalisation
-- `nuxt-mairie/i18n/i18n.config.ts`
-- `nuxt-mairie/i18n/locales/fr.json`
-- `nuxt-mairie/i18n/locales/dioula.json`
-- `nuxt-mairie/locales/fr.json`
-- `nuxt-mairie/locales/dioula.json`
-
-Le site est configuré pour :
-- Français par défaut
-- Dioula en langue supplémentaire
-- stratégie `prefix_except_default`
+Le header est utilisé par le layout global [nuxt-mairie/layouts/default.vue](nuxt-mairie/layouts/default.vue), ce qui lui permet de rester présent sur toutes les pages.
 
 ---
 
-## 7. Flux de données principal
+## 5. Composants et leurs rôles
 
-### Schéma de fonctionnement
+### 5.1 Composants de la page d’accueil
+La page d’accueil est construite à partir de plusieurs blocs sectionnels.
 
-1. Le frontend Nuxt charge les contenus via `useFetch` ou `useAsyncData`.
-2. Les appelés passent par des routes serveur internes comme `/api/actualites`.
-3. Ces routes appellent l’API Strapi (`config.strapiUrl`) avec des filtres, tri et pagination.
-4. Les éléments reçus sont transformés dans `server/utils/strapi.ts` pour correspondre au format attendu par le frontend.
-5. Le frontend affiche les données dans les pages et composants Vue.
-6. Si Strapi est indisponible, un fallback JSON local est utilisé dans les APIs du frontend.
+#### [nuxt-mairie/components/home/ActualitesSection.vue](nuxt-mairie/components/home/ActualitesSection.vue)
+Ce composant :
 
-### Exemple concret : actualités
-- `pages/index.vue` charge des actualités via `useFetch('/api/actualites', { query: { perPage: 8 } })`
-- `server/api/actualites.get.ts` construit la requête Strapi
-- transformation via `transformActualite()` dans `server/utils/strapi.ts`
-- résultat renvoyé au frontend sous forme de `items`, `total`, `page`, `perPage`
+- récupère les dernières actualités via l’API interne Nuxt,
+- affiche un carrousel de cartes d’articles,
+- affiche les cartes avec image, catégorie, date, titre,
+- redirige vers la page détail de l’article.
 
-### Exemple concret : projets
-- `server/api/projects.get.ts` charge les projets depuis Strapi,
-- si erreur, fallback vers `data/projects.json`,
-- plusieurs filtres possibles : statut, recherche, catégorie.
+#### [nuxt-mairie/components/home/PostDuJour.vue](nuxt-mairie/components/home/PostDuJour.vue)
+C’est la section “À la une”. Elle prend le premier article mis en avant et affiche :
 
----
+- le titre,
+- l’extrait,
+- la date,
+- l’auteur,
+- l’image d’illustration,
+- le lien vers l’article.
 
-## 8. Structure du backend Strapi
+#### [nuxt-mairie/components/home/EventCarousel.vue](nuxt-mairie/components/home/EventCarousel.vue)
+C’est la zone d’événements. Elle reçoit les contenus d’événements depuis l’API serveur et les affiche dans un carrousel ou une liste thématique.
 
-Le dossier `strapi-admin/src/api/` contient les content-types principaux :
+#### [nuxt-mairie/components/home/FlashInfo.vue](nuxt-mairie/components/home/FlashInfo.vue)
+Ce composant affiche les flash infos (informations urgentes ou poches messages de service).
 
-- `/actualite/`
-- `/evenement/`
-- `/flash-info/`
-- `/projet/`
+#### [nuxt-mairie/components/home/CitoyenForm.vue](nuxt-mairie/components/home/CitoyenForm.vue)
+Il affiche un formulaire de contact ou de service citoyen. Ce n’est pas directement lié à une table Strapi dans ce projet ; c’est souvent un bloc d’interaction front.
 
-Ils correspondent grosso modo aux contenus suivants :
-- actualités
-- événements
-- flash infos
-- projets
+#### [nuxt-mairie/components/home/ProjetsSection.vue](nuxt-mairie/components/home/ProjetsSection.vue)
+Affiche les projets phares de la commune avec visuel, intitulé, description et / ou liens.
 
-Les configurations globales du serveur et base sont dans :
-- `strapi-admin/config/server.js`
-- `strapi-admin/config/database.js`
-- `strapi-admin/config/admin.js`
+#### [nuxt-mairie/components/home/QueFaireSection.vue](nuxt-mairie/components/home/QueFaireSection.vue)
+Affiche des rubriques “Que faire / Où aller” selon des catégories comme hôtels, restaurants, tourisme, sport, etc.
 
-### Impact fonctionnel
-Le CMS est la source éditable du contenu. La plupart des contenus visibles sur le site public sont rendus dynamiquement à partir de Strapi.
+### 5.2 Composants UI réutilisables
 
----
+#### [nuxt-mairie/components/ui/NewsCard.vue](nuxt-mairie/components/ui/NewsCard.vue)
+Carte générique pour afficher une actualité.
 
-## 9. Règles de content management importantes
+#### [nuxt-mairie/components/ui/ProjectCard.vue](nuxt-mairie/components/ui/ProjectCard.vue)
+Carte de projet réutilisable.
 
-### Fichiers JSON locaux utiles pour le fallback
-Les données JSON locales peuvent servir à :
-- travailler sans Strapi,
-- faire des tests de rendu,
-- alimenter des contenus d’exemple avant publication.
+#### [nuxt-mairie/components/ui/ProjectModal.vue](nuxt-mairie/components/ui/ProjectModal.vue)
+Modale de détail pour ouvrir un projet en popup.
 
-Fichiers concernés :
-- `nuxt-mairie/data/actualites.json`
-- `nuxt-mairie/data/projects.json`
-- `nuxt-mairie/data/elus.json`
+#### [nuxt-mairie/components/ui/FlipCard.vue](nuxt-mairie/components/ui/FlipCard.vue)
+Carte avec animation flip utilisée pour des présentations visuelles.
 
-### Références de contenus
-Le site utilise des champs comme :
-- `slug`
-- `publishedAt`
-- `featured`
-- `category`
-- `status`
-- `coverImage`
-- `tags`
+#### [nuxt-mairie/components/ui/ServiceAccordion.vue](nuxt-mairie/components/ui/ServiceAccordion.vue)
+Accordion pour afficher les services ou démarches administratives par catégorie.
 
-La transformation côté Nuxt normalise les valeurs Strapi pour l’affichage front.
+### 5.3 Layout global
+
+#### [nuxt-mairie/layouts/default.vue](nuxt-mairie/layouts/default.vue)
+Le layout global reçoit :
+
+- le header,
+- le footer,
+- les transitions entre pages,
+- le conteneur global de l’application.
 
 ---
 
-## 10. Points de vigilance / risques connus
+## 6. Comment les pages interagissent entre elles
 
-### 10.1 Base de données Strapi
-La configuration de la DB est définie explicitement dans `config/database.js`; si la base n’existe pas ou si les identifiants sont mauvais, le démarrage du CMS échoue.
+Le système repose sur trois niveaux d’interaction :
 
-### 10.2 Fallback JSON
-Le frontend utilise le JSON local quand Strapi n’est pas disponible, ce qui peut entraîner des écarts entre les contenus en staging/local et le CMS réel.
+### 6.1 Niveau 1 : navigation entre pages
+Les pages sont liées via `NuxtLink` ou les liens du header.
 
-### 10.3 i18n et URLs
-La configuration i18n applique un comportement de routage spécifique : le français est la langue par défaut sans préfixe, le dioula est préfixé.
+Exemple :
 
-### 10.4 Prototypes statiques hérités
-Les fichiers HTML de la racine ne doivent pas être pris comme source de vérité pour le site actuel. Le projet actif est le frontend Nuxt + Strapi.
+- clique sur une carte actualité → redirection vers /actualites/[slug]
+- clique sur “Services” → navigation vers /services
+- clique sur un projet → ouverture d’une vue ou d’une modale
 
-### 10.5 dépendances et versions
-Le frontend et Strapi doivent tourner avec des versions Node compatibles. Le backend impose `node >=20` et le frontend est pensé en Nuxt 3 avec Vue 3 moderne.
+### 6.2 Niveau 2 : appel API côté Nuxt
+Les composants et pages ne chargent pas directement Strapi. Ils passent par des routes Nuxt internes dans [nuxt-mairie/server/api](nuxt-mairie/server/api).
 
----
+Exemple réel dans [nuxt-mairie/pages/index.vue](nuxt-mairie/pages/index.vue) :
 
-## 11. Commandes de référence rapide
+- `useFetch('/api/actualites', { query: { perPage: 8 } })`
+- `useFetch('/api/flash-info')`
+- `useFetch('/api/evenements', { query: { perPage: 6 } })`
 
-### Frontend
-```bash
-cd nuxt-mairie
-npm install
-npm run dev
-npm run build
-npm run preview
-npm run generate
-```
+Cela donne un accès centralisé au backend et simplifie la logique front.
 
-### Strapi
-```bash
-cd strapi-admin
-npm install
-npm run develop
-npm run build
-npm run start
-```
+### 6.3 Niveau 3 : transformation des données
+Les données récupérées de Strapi sont normalisées dans [nuxt-mairie/server/utils/strapi.ts](nuxt-mairie/server/utils/strapi.ts).
 
----
+Ce fichier contient des fonctions comme :
 
-## 12. Comment reprendre le projet
+- `transformActualite()`
+- `transformProject()`
+- `transformEvenement()`
+- `transformFlashInfo()`
 
-### Pour un développeur
-1. Cloner le dépôt.
-2. Installer les dépendances du frontend et du CMS.
-3. Créer la base PostgreSQL pour Strapi.
-4. Configurer les variables d’environnement.
-5. Démarrer Strapi puis vérifier l’admin.
-6. Démarrer le frontend Nuxt.
-7. Vérifier les contenus dans : actualités, projets, événements, flash infos.
-8. Modifier les données côté CMS ou dans les JSON de fallback selon le besoin.
+Ces fonctions :
 
-### Pour un agent IA / assistant de code
-Considérer les points suivants comme source de vérité :
-- `nuxt-mairie/` = code applicatif principal
-- `strapi-admin/` = CMS éditable
-- `server/utils/strapi.ts` = point central de transformation des données
-- `data/*.json` = fallback local et source des contenus de secours
-- `nuxt.config.ts` = centre de configuration du frontend
+- convertissent les objets Strapi en structures plus simples,
+- gèrent les URLs de médias,
+- normalisent les images de couverture,
+- créent des champs utiles pour le front comme `coverImage`, `categoryLabel`, `slug`, `excerpt`.
 
 ---
 
-## 13. À retenir
+## 7. Flux de récupération des données
 
-Le projet n’est pas un simple site statique : c’est une application Nuxt 3 connectée à Strapi pour la gestion des contenus. Le code le plus important à connaître pour comprendre le flux complet est :
+### 7.1 Exemple : article principal
+Le flux est le suivant :
 
-- `nuxt-mairie/nuxt.config.ts`
-- `nuxt-mairie/server/api/*.get.ts`
-- `nuxt-mairie/server/utils/strapi.ts`
-- `nuxt-mairie/pages/*.vue`
-- `strapi-admin/config/*.js`
-- `strapi-admin/src/api/*`
+1. La page [nuxt-mairie/pages/actualites/[slug].vue](nuxt-mairie/pages/actualites/[slug].vue) reçoit le slug depuis l’URL.
+2. Elle exécute `useFetch('/api/actualites/${slug}')`.
+3. La route serveur [nuxt-mairie/server/api/actualites/[slug].get.ts](nuxt-mairie/server/api/actualites/[slug].get.ts) appelle l’API Strapi.
+4. Strapi renvoie le contenu éditorial.
+5. Les données sont transformées dans [nuxt-mairie/server/utils/strapi.ts](nuxt-mairie/server/utils/strapi.ts).
+6. La page affiche :
+   - le titre,
+   - la couverture,
+   - le texte,
+   - la galerie,
+   - les tags,
+   - la date,
+   - l’auteur,
+   - les éléments visuels associés.
+
+### 7.2 Exemple : page d’accueil
+Dans [nuxt-mairie/pages/index.vue](nuxt-mairie/pages/index.vue), plusieurs appels de données sont lancés :
+
+- dernières actualités,
+- article à la une,
+- flash infos,
+- événements,
+- données statiques de projets ou contenus de démonstration.
+
+Ensuite, les données sont transmises aux composants de section :
+
+- `HomeEventCarousel`
+- `HomePostDuJour`
+- `HomeFlashInfo`
+- `HomeCitoyenForm`
+- `ActualitesSection`
+
+### 7.3 Exemple : liste des actualités
+Le fichier [nuxt-mairie/pages/actualites/index.vue](nuxt-mairie/pages/actualites/index.vue) récupère les actualités, les filtre éventuellement, les trie, puis les affiche en cards ou en liste.
 
 ---
 
-## 14. Recommandation pour la continuité
+## 8. Rôle des API serveur dans Nuxt
 
-Pour éviter les erreurs de reprise :
-- garder Strapi comme source de vérité des contenus éditoriaux,
-- utiliser les JSON locaux uniquement pour fallback ou prototypage,
-- documenter toute modification de structure de contenu dans le CMS,
-- vérifier la compatibilité des champs Strapi avec les transformateurs Nuxt.
+Le dossier [nuxt-mairie/server/api](nuxt-mairie/server/api) sert de pont entre le front et Strapi.
+
+Les fichiers les plus importants sont :
+
+- [nuxt-mairie/server/api/actualites.get.ts](nuxt-mairie/server/api/actualites.get.ts) : liste des actualités
+- [nuxt-mairie/server/api/actualites/[slug].get.ts](nuxt-mairie/server/api/actualites/[slug].get.ts) : détail d’un article
+- [nuxt-mairie/server/api/projects.get.ts](nuxt-mairie/server/api/projects.get.ts) : projets
+- [nuxt-mairie/server/api/evenements.get.ts](nuxt-mairie/server/api/evenements.get.ts) : événements
+- [nuxt-mairie/server/api/flash-info.get.ts](nuxt-mairie/server/api/flash-info.get.ts) : flash infos
+- [nuxt-mairie/server/api/elus.get.ts](nuxt-mairie/server/api/elus.get.ts) : élus
+
+Par convention, le front ne contacte pas Strapi directement. Il appelle plutôt l’API interne de Nuxt, qui elle-même appelle Strapi. Cela centralise les règles métier, les filtres, la sécurité et la transformation des données.
 
 ---
 
-## 15. Résumé ultra court
+## 9. Gestion des médias et transformation Strapi
 
-- Frontend : Nuxt 3 / Vue 3 / Bootstrap / i18n
-- Backend : Strapi 5 / PostgreSQL
-- Site public : `nuxt-mairie/`
-- CMS : `strapi-admin/`
-- Données de fallback : `nuxt-mairie/data/`
-- Point de transformation Strapi → front : `nuxt-mairie/server/utils/strapi.ts`
+Le fichier [nuxt-mairie/server/utils/strapi.ts](nuxt-mairie/server/utils/strapi.ts) est très important car il est le point de normalisation entre Strapi et Nuxt.
 
-Cette documentation doit permettre à un autre développeur ou à une IA de reprendre le projet sans faire de suppositions sur l’architecture ou le rôle de chaque dossier.
+Il gère notamment :
+
+- les champs de média Strapi (`coverImage`, `gallery`),
+- les images d’illustration et galeries,
+- les URL de media locales ou cloud,
+- les valeurs de fallback,
+- les conversions de libellés de catégories,
+- les textes d’extraits s’il manque un résumé.
+
+Exemple : une image Strapi peut arriver sous forme d’objet complexe ; la fonction `mediaUrl()` transforme ce format brut en URL exploitable par le front.
+
+Cela permet d’éviter de casser l’affichage si les images viennent :
+
+- de Strapi local,
+- de Cloudinary,
+- d’un ancien format legacy,
+- d’un payload contenant plusieurs variantes de structures.
+
+---
+
+## 10. Les points de cohérence à conserver
+
+Pour éviter les régressions, il faut garder en tête ces règles de conception :
+
+- Nuxt est le front public, il ne doit pas manipuler directement la base.
+- Strapi est la source éditoriale et doit rester la source de vérité pour les contenus.
+- Supabase héberge la base PostgreSQL de Strapi.
+- Cloudinary stocke les médias.
+- Les URL legacy ne doivent pas être la source de vérité pour les images.
+- Les champs média doivent être lisibles par Nuxt sous les bonnes clés comme `coverImage`, `gallery`, `image`, etc.
+- Les pages Nuxt reposent sur les fichiers du dossier [nuxt-mairie/pages](nuxt-mairie/pages) et les composants sectionnels du dossier [nuxt-mairie/components](nuxt-mairie/components).
+
+---
+
+## 11. Vue d’ensemble du parcours utilisateur
+
+Un utilisateur visite le site de la manière suivante :
+
+1. il ouvre la page d’accueil,
+2. le header affiche les sections disponibles,
+3. la page d’accueil charge les données de Strapi via les API internes,
+4. les blocs affichent les actualités, flash infos, événements, projets,
+5. si l’utilisateur clique sur une actualité, la route change vers /actualites/[slug],
+6. la page détail récupère l’article associé,
+7. la galerie et le contenu sont affichés,
+8. la navigation reste cohérente grâce au système de routage Nuxt.
+
+---
+
+## 12. Fichiers clés à connaître pour reprendre le projet
+
+Pour comprendre le projet sans ambiguïté, les fichiers les plus importants sont :
+
+- [nuxt-mairie/nuxt.config.ts](nuxt-mairie/nuxt.config.ts)
+- [nuxt-mairie/server/utils/strapi.ts](nuxt-mairie/server/utils/strapi.ts)
+- [nuxt-mairie/server/api](nuxt-mairie/server/api)
+- [nuxt-mairie/pages/index.vue](nuxt-mairie/pages/index.vue)
+- [nuxt-mairie/pages/actualites/[slug].vue](nuxt-mairie/pages/actualites/[slug].vue)
+- [nuxt-mairie/components/layout/AppHeader.vue](nuxt-mairie/components/layout/AppHeader.vue)
+- [nuxt-mairie/components/home/ActualitesSection.vue](nuxt-mairie/components/home/ActualitesSection.vue)
+- [strapi-admin/config/plugins.js](strapi-admin/config/plugins.js)
+- [strapi-admin/src/api](strapi-admin/src/api)
+
+---
+
+## 13. Résumé court
+
+- Front public : Nuxt 3
+- CMS : Strapi 5
+- Base : Supabase / PostgreSQL
+- Médias : Cloudinary
+- Rôle de Nuxt : afficher les contenus et gérer le routage du site
+- Rôle de Strapi : éditer les contenus et exposer l’API
+- Rôle de Supabase : stocker les données structurées
+- Rôle de Cloudinary : stocker les images et les médias
+- Point clé : les pages Nuxt récupèrent les données via des routes serveur internes, puis les composants affichent les blocs enrichis après transformation dans le helper Strapi.
+
+Cette structure permet de séparer clairement les responsabilités tout en gardant un site moderne, facilement éditable et scalable.
