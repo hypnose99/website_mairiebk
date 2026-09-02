@@ -98,7 +98,7 @@ export interface Actualite {
   slug: string
   title: string
   excerpt: string
-  content: string        // HTML ou Markdown
+  content: unknown       // Strapi Blocks ou HTML legacy
   category: ActualiteCategory
   categoryLabel: string
   publishedAt: string    // ISO 8601
@@ -106,6 +106,8 @@ export interface Actualite {
   coverImage: string
   coverImageAlt: string
   featured: boolean
+  views: number
+  likes: number
   tags: string[]
 }
 

@@ -1,11 +1,30 @@
 // server/utils/strapi.ts — Utilitaires pour l'API Strapi 5
 
+import { extractPlainText } from '~/utils/content'
+
 const CATEGORY_LABELS: Record<string, string> = {
   urbanisme: 'Urbanisme & Travaux',
   economie:  'Économie Locale',
   sante:     'Santé',
   education: 'Éducation',
   culture:   'Culture & Sport',
+}
+
+/** Génère un slug stable lorsque Strapi renvoie un slug vide. */
+export function slugify(value: unknown): string {
+  if (typeof value !== 'string') return ''
+
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
+export function actualiteSlug(item: any): string {
+  const slug = typeof item?.slug === 'string' ? item.slug.trim() : ''
+  return slugify(item?.title) || slug || item?.documentId || String(item?.id ?? '')
 }
 
 /** Headers d'authentification Strapi */
@@ -37,18 +56,20 @@ function resolveCoverImage(item: any, strapiBase: string): string | null {
   return mediaUrl(item?.coverImage, strapiBase) ?? mediaUrl(item?.image, strapiBase) ?? item?.coverImageUrl ?? item?.imageUrl ?? null
 }
 
-/** Génère un extrait depuis le contenu HTML si excerpt est vide */
-function autoExcerpt(excerpt: string, content: string, maxLen = 200): string {
-  if (excerpt?.trim()) return excerpt.trim()
-  const text = (content ?? '').replace(/<[^>]*>/g, '').trim()
-  return text.length <= maxLen ? text : text.slice(0, maxLen).replace(/\s+\S*$/, '') + '…'
+/** Génère un extrait depuis un résumé ou un contenu Strapi Blocks/HTML. */
+function autoExcerpt(excerpt: unknown, content: unknown, maxLen = 100): string {
+  const excerptText = extractPlainText(excerpt)
+  if (excerptText) return excerptText.substring(0, maxLen) + (excerptText.length > maxLen ? '...' : '')
+
+  const text = extractPlainText(content)
+  return text.substring(0, maxLen) + (text.length > maxLen ? '...' : '')
 }
 
 /** Transforme un item Strapi 5 Actualite → format utilisé dans Nuxt */
 export function transformActualite(item: any, strapiBase: string) {
   // `coverImage` est le champ média principal. `coverImageUrl` n'est gardé que pour compatibilité historique.
   const coverImage = resolveCoverImage(item, strapiBase)
-  const content    = item.content ?? ''
+  const content    = item.content ?? item.contenu ?? ''
   const coverImageAlt =
     item?.coverImage?.data?.attributes?.alternativeText ??
     item?.coverImage?.alternativeText ??
@@ -58,7 +79,7 @@ export function transformActualite(item: any, strapiBase: string) {
 
   return {
     id:            item.documentId ?? String(item.id),
-    slug:          item.slug,
+    slug:          actualiteSlug(item),
     title:         item.title,
     excerpt:       autoExcerpt(item.excerpt, content),
     content,
@@ -69,6 +90,8 @@ export function transformActualite(item: any, strapiBase: string) {
     coverImage,
     coverImageAlt,
     featured:      item.featured ?? false,
+    views:         Number(item.views) || 0,
+    likes:         Number(item.likes) || 0,
     tags:          item.tags ?? [],
     videoUrl:      item.videoUrl ?? null,
     gallery:       (item.gallery ?? []).map((g: any) => ({ url: mediaUrl(g, strapiBase) })),
