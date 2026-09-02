@@ -64,6 +64,16 @@
     "featured": {
       "type": "boolean"
     },
+    "views": {
+      "type": "integer",
+      "default": 0,
+      "min": 0
+    },
+    "likes": {
+      "type": "integer",
+      "default": 0,
+      "min": 0
+    },
     "coverImageUrl": {
       "type": "string"
     }

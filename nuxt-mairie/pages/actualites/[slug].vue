@@ -1,5 +1,7 @@
 <script setup lang="ts">
 // pages/actualites/[slug].vue — Page article premium
+import { extractPlainText } from '~/utils/content'
+
 const route = useRoute()
 const slug = computed(() => route.params.slug as string)
 
@@ -36,28 +38,9 @@ const formattedDate = computed(() =>
 )
 
 // Temps de lecture estimé
-// Temps de lecture estimé
 const readingTime = computed(() => {
-  // Récupère le champ (selon si vous l'avez nommé content ou contenu dans Strapi)
-  const rawContent = article.value?.contenu || article.value?.content;
-  let text = "";
-
-  if (Array.isArray(rawContent)) {
-    // Nouveau format (Strapi Blocks) : on extrait le texte de chaque bloc enfant
-    const extractText = (blocks: any[]) => {
-      let str = "";
-      blocks.forEach(block => {
-        if (block.text) str += block.text + " ";
-        if (block.children) str += extractText(block.children) + " ";
-      });
-      return str;
-    };
-    text = extractText(rawContent);
-  } else if (typeof rawContent === "string") {
-    // Ancien format (Texte brut/HTML) : on retire les balises
-    text = rawContent.replace(/<[^>]*>/g, '');
-  }
-
+  const rawContent = article.value?.content ?? article.value?.contenu
+  const text = extractPlainText(rawContent)
   const words = text.trim().split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.ceil(words / 200));
 })
@@ -93,15 +76,10 @@ function nextImg() {
   if (lightboxIndex.value !== null) lightboxIndex.value = (lightboxIndex.value + 1) % len
 }
 
-// ── Vues & Likes (localStorage, sera remplacé par Strapi) ──
-function seedFromSlug(s: string, max: number): number {
-  let h = 0
-  for (const c of s) h = ((h << 5) - h) + c.charCodeAt(0)
-  return max + Math.abs(h % (max * 6))
-}
 const viewCount  = ref(0)
 const isLiked    = ref(false)
 const likeCount  = ref(0)
+const likePending = ref(false)
 
 // ── Commentaires ──
 interface ArticleComment {
@@ -111,35 +89,57 @@ const comments   = ref<ArticleComment[]>([])
 const commentForm = reactive({ name: '', text: '' })
 const commentSent = ref(false)
 
-onMounted(() => {
-  const s = slug.value
-  // Vues
-  const base = seedFromSlug(s, 200)
-  const stored = parseInt(localStorage.getItem(`v_${s}`) ?? '0')
-  const next = stored === 0 ? base + 1 : stored + 1
-  localStorage.setItem(`v_${s}`, String(next))
-  viewCount.value = next
-  // Likes
-  const baseLikes = Math.floor(seedFromSlug(s, 20) * 0.12)
-  const adj = parseInt(localStorage.getItem(`la_${s}`) ?? '0')
-  likeCount.value = baseLikes + adj
-  isLiked.value = localStorage.getItem(`lk_${s}`) === '1'
+onMounted(async () => {
+  const identifier = article.value?.id ?? slug.value
+  const viewKey = `viewed_${identifier}`
+  const likeKey = `liked_${identifier}`
+
+  viewCount.value = Number(article.value?.views) || 0
+  likeCount.value = Number(article.value?.likes) || 0
+  isLiked.value = localStorage.getItem(likeKey) === '1'
+
+  if (localStorage.getItem(viewKey) !== '1') {
+    try {
+      const result = await $fetch<{ views: number }>(`/api/actualites/${encodeURIComponent(identifier)}/view`, { method: 'POST' })
+      viewCount.value = result.views
+      localStorage.setItem(viewKey, '1')
+    } catch {
+      // Le compteur initial reste visible si l'incrémentation échoue.
+    }
+  }
   // Commentaires
-  const raw = localStorage.getItem(`cm_${s}`)
+  const raw = localStorage.getItem(`cm_${slug.value}`)
   if (raw) comments.value = JSON.parse(raw)
 })
 
-function toggleLike() {
-  const s = slug.value
+async function toggleLike() {
+  if (likePending.value) return
+
+  const identifier = article.value?.id ?? slug.value
+  const likeKey = `liked_${identifier}`
+  likePending.value = true
+
   if (isLiked.value) {
-    isLiked.value = false; likeCount.value--
-    localStorage.setItem(`lk_${s}`, '0')
-    localStorage.setItem(`la_${s}`, String(parseInt(localStorage.getItem(`la_${s}`) ?? '0') - 1))
+    try {
+      const result = await $fetch<{ likes: number }>(`/api/actualites/${encodeURIComponent(identifier)}/like`, { method: 'DELETE' })
+      isLiked.value = false
+      likeCount.value = result.likes
+      localStorage.removeItem(likeKey)
+    } catch {
+      // L'état local ne change pas si Strapi ne répond pas.
+    }
   } else {
-    isLiked.value = true; likeCount.value++
-    localStorage.setItem(`lk_${s}`, '1')
-    localStorage.setItem(`la_${s}`, String(parseInt(localStorage.getItem(`la_${s}`) ?? '0') + 1))
+    try {
+      const result = await $fetch<{ likes: number }>(`/api/actualites/${encodeURIComponent(identifier)}/like`, { method: 'POST' })
+      isLiked.value = true
+      likeCount.value = result.likes
+      localStorage.setItem(likeKey, '1')
+    } catch {
+      // L'état local ne change pas si Strapi ne répond pas.
+    }
   }
+
+  likePending.value = false
 }
 function submitComment() {
   if (!commentForm.name.trim() || !commentForm.text.trim()) return
@@ -205,7 +205,6 @@ useSeoMeta({
         </nav>
         <span class="hero-category-badge" :style="{ background: catColor }">{{ article.categoryLabel }}</span>
         <h1 class="hero-title">{{ article.title }}</h1>
-        <p class="hero-excerpt">{{ article.excerpt }}</p>
         <div class="hero-meta">
           <span class="hero-meta-item"><i class="bi bi-person-fill" /> {{ article.author }}</span>
           <span class="hero-meta-sep" />
@@ -495,12 +494,8 @@ useSeoMeta({
   text-transform: uppercase; padding: 4px 14px; border-radius: 3px; margin-bottom: 16px;
 }
 .hero-title {
-  font-size: clamp(26px, 4vw, 46px); font-weight: 900; color: #fff;
+  font-size: clamp(22px, 2.7vw, 34px); font-weight: 900; color: #fff;
   line-height: 1.15; margin-bottom: 16px; text-shadow: 0 2px 12px rgba(0,0,0,0.4);
-}
-.hero-excerpt {
-  color: rgba(255,255,255,0.85); font-size: 17px; line-height: 1.6;
-  max-width: 680px; margin-bottom: 24px;
 }
 .hero-meta {
   display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
