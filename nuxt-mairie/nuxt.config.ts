@@ -8,6 +8,7 @@ export default defineNuxtConfig({
   modules: [
     '@pinia/nuxt',
     '@nuxtjs/i18n',
+    'nuxt-strapi-blocks-renderer',
   ],
 
   // ─── i18n ─────────────────────────────────────────────────────────────────

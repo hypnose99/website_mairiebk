@@ -492,7 +492,7 @@ export interface ApiActualiteActualite extends Struct.CollectionTypeSchema {
     category: Schema.Attribute.Enumeration<
       ['urbanisme', 'economie', 'education', 'culture', 'sante']
     >;
-    content: Schema.Attribute.Text;
+    content: Schema.Attribute.Blocks;
     coverImage: Schema.Attribute.Media<
       'images' | 'files' | 'videos' | 'audios'
     >;

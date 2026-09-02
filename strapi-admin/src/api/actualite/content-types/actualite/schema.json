@@ -16,7 +16,7 @@
       "required": true
     },
     "content": {
-      "type": "text"
+      "type": "blocks"
     },
     "category": {
       "type": "enumeration",

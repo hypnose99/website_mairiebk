@@ -36,10 +36,30 @@ const formattedDate = computed(() =>
 )
 
 // Temps de lecture estimé
+// Temps de lecture estimé
 const readingTime = computed(() => {
-  const text = (article.value?.content ?? '').replace(/<[^>]*>/g, '')
-  const words = text.trim().split(/\s+/).filter(Boolean).length
-  return Math.max(1, Math.ceil(words / 200))
+  // Récupère le champ (selon si vous l'avez nommé content ou contenu dans Strapi)
+  const rawContent = article.value?.contenu || article.value?.content;
+  let text = "";
+
+  if (Array.isArray(rawContent)) {
+    // Nouveau format (Strapi Blocks) : on extrait le texte de chaque bloc enfant
+    const extractText = (blocks: any[]) => {
+      let str = "";
+      blocks.forEach(block => {
+        if (block.text) str += block.text + " ";
+        if (block.children) str += extractText(block.children) + " ";
+      });
+      return str;
+    };
+    text = extractText(rawContent);
+  } else if (typeof rawContent === "string") {
+    // Ancien format (Texte brut/HTML) : on retire les balises
+    text = rawContent.replace(/<[^>]*>/g, '');
+  }
+
+  const words = text.trim().split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.ceil(words / 200));
 })
 
 // Couleur par catégorie
@@ -217,7 +237,9 @@ useSeoMeta({
         <div class="article-content-box">
           <div class="article-accent-bar" :style="{ background: catColor }" />
           <!-- eslint-disable-next-line vue/no-v-html -->
-          <div class="article-content" v-html="article.content" />
+          <div class="article-content">
+            <StrapiBlocksText :nodes="article.content" />
+          </div>
         </div>
 
         <!-- Tags -->

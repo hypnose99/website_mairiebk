@@ -16,6 +16,7 @@
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
     "nuxt": "^3.16.0",
+    "nuxt-strapi-blocks-renderer": "^1.1.5",
     "pinia": "^3.0.0",
     "vue": "^3.5.11",
     "vue-router": "^4.4.5"
