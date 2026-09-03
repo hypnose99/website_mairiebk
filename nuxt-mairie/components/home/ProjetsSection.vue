@@ -4,14 +4,25 @@ export interface Projet {
   id: string
   label: string
   title: string
-  image: string
+  image: string | null
   text: string
-  docs: ProjetDoc[]
+  status?: string
+  category?: string
+  dateDebut?: string | null
+  dateFin?: string | null
+  maitreOuvrage?: string
+  bailleurs?: string
 }
 
 const props = defineProps<{ projets: Projet[] }>()
 const activeId = ref(props.projets[0]?.id ?? '')
-const active = computed(() => props.projets.find(p => p.id === activeId.value)!)
+const active = computed(() => props.projets.find(p => p.id === activeId.value) ?? props.projets[0])
+
+watch(() => props.projets, (projects) => {
+  if (projects.length && !projects.some(project => project.id === activeId.value)) {
+    activeId.value = projects[0].id
+  }
+}, { deep: true })
 </script>
 
 <template>
@@ -25,7 +36,7 @@ const active = computed(() => props.projets.find(p => p.id === activeId.value)!)
         </div>
       </div>
 
-      <div class="proj-layout">
+      <div v-if="active" class="proj-layout">
         <div class="proj-tabs">
           <button v-for="p in projets" :key="p.id" class="proj-tab"
             :class="{ 'proj-tab--active': activeId === p.id }"
@@ -36,24 +47,25 @@ const active = computed(() => props.projets.find(p => p.id === activeId.value)!)
 
         <Transition name="fade-tab" mode="out-in">
           <div :key="activeId" class="proj-content">
-            <div class="proj-img-wrap">
+            <div v-if="active.image" class="proj-img-wrap">
               <img :src="active.image" :alt="active.title" class="proj-img" />
             </div>
+            <div v-else class="proj-img-wrap proj-img-wrap--empty">Image à venir</div>
             <div class="proj-info">
               <h3 class="proj-title">{{ active.title }}</h3>
               <p class="proj-text">{{ active.text }}</p>
-              <div v-if="active.docs.length" class="proj-docs">
-                <p class="proj-docs__label">Documents disponibles</p>
-                <a v-for="doc in active.docs" :key="doc.label" href="#" class="proj-doc">
-                  <span>{{ doc.icon }}</span>
-                  <span>{{ doc.label }}</span>
-                  <span class="proj-doc__size">{{ doc.size }}</span>
-                </a>
+              <div class="proj-meta">
+                <span v-if="active.status"><i class="bi bi-circle-fill" /> {{ active.status.replace('_', ' ') }}</span>
+                <span v-if="active.category"><i class="bi bi-layers" /> {{ active.category }}</span>
+                <span v-if="active.dateDebut || active.dateFin"><i class="bi bi-calendar3" /> {{ active.dateDebut || '...' }} → {{ active.dateFin || '...' }}</span>
+                <span v-if="active.maitreOuvrage"><i class="bi bi-building" /> {{ active.maitreOuvrage }}</span>
+                <span v-if="active.bailleurs"><i class="bi bi-bank" /> {{ active.bailleurs }}</span>
               </div>
             </div>
           </div>
         </Transition>
       </div>
+      <p v-else class="proj-empty">Aucun projet à afficher.</p>
     </div>
   </section>
 </template>
@@ -79,11 +91,20 @@ const active = computed(() => props.projets.find(p => p.id === activeId.value)!)
 .proj-tab--active:hover { background: #007a33; color: white; }
 
 .proj-content { display: grid; grid-template-columns: 1fr 1fr; }
-.proj-img-wrap { height: 100%; min-height: 320px; overflow: hidden; }
-.proj-img { width: 100%; height: 100%; object-fit: cover; }
+.proj-img-wrap {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  align-self: start;
+  overflow: hidden;
+}
+.proj-img-wrap--empty { display: flex; align-items: center; justify-content: center; background: #F2F1EC; color: #777; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; }
+.proj-img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .proj-info { padding: 40px; }
 .proj-title { font-size: 1.4rem; font-weight: 900; color: #0D0D0D; text-transform: uppercase; margin: 0 0 16px; }
 .proj-text { font-size: 0.9rem; color: #555; line-height: 1.7; margin-bottom: 24px; }
+.proj-meta { display: flex; flex-wrap: wrap; gap: 8px; padding-top: 18px; border-top: 1px solid #EBEBEB; color: #555; font-size: 0.72rem; }
+.proj-meta span { padding: 6px 9px; background: #F7F7F5; }
+.proj-meta i { color: #009640; margin-right: 4px; }
 .proj-docs { border-top: 1px solid #EBEBEB; padding-top: 20px; }
 .proj-docs__label { font-size: 0.65rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.12em; color: #009640; margin-bottom: 10px; }
 .proj-doc { display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid #EBEBEB; margin-bottom: 6px; font-size: 0.82rem; font-weight: 700; color: #0D0D0D; text-decoration: none; transition: background 0.2s; }

@@ -5,28 +5,27 @@ import { extractPlainText } from '~/utils/content'
 const route = useRoute()
 const slug = computed(() => route.params.slug as string)
 
-const { data: article, error } = await useFetch(`/api/actualites/${slug.value}`, {
+const { data: article, error, pending: articlePending, refresh: refreshArticle } = await useLazyFetch(`/api/actualites/${slug.value}`, {
   key: `article-${slug.value}`,
+  getCachedData: () => null,
 })
 if (error.value) {
   throw createError({ statusCode: 404, statusMessage: 'Article introuvable' })
 }
 
 // Articles de la même catégorie (sidebar)
-const { data: relatedData } = useFetch('/api/actualites', {
+const { data: relatedData } = useLazyFetch('/api/actualites', {
   query: { category: article.value?.category, perPage: 6 },
   key: `related-${article.value?.category}`,
-  lazy: true,
 })
 const related = computed(() =>
   (relatedData.value?.items ?? []).filter((a: any) => a.slug !== slug.value).slice(0, 3)
 )
 
 // Articles à la une (sidebar)
-const { data: featuredData } = useFetch('/api/actualites', {
+const { data: featuredData } = useLazyFetch('/api/actualites', {
   query: { perPage: 10 },
   key: 'featured-articles',
-  lazy: true,
 })
 const featured = computed(() =>
   (featuredData.value?.items ?? []).filter((a: any) => a.featured && a.slug !== slug.value).slice(0, 3)
@@ -94,6 +93,7 @@ const commentForm = reactive({ name: '', text: '' })
 const commentSent = ref(false)
 
 onMounted(async () => {
+  await refreshArticle({ dedupe: 'defer' })
   const identifier = article.value?.id ?? slug.value
   const viewKey = `viewed_${identifier}`
   const likeKey = `liked_${identifier}`
@@ -104,8 +104,13 @@ onMounted(async () => {
 
   if (localStorage.getItem(viewKey) !== '1') {
     try {
-      const result = await $fetch<{ views: number }>(`/api/actualites/${encodeURIComponent(identifier)}/view`, { method: 'POST' })
+      const result = await $fetch<{ views: number; likes: number }>(`/api/actualites/${encodeURIComponent(identifier)}/view`, { method: 'POST' })
       viewCount.value = result.views
+      likeCount.value = result.likes
+      if (article.value) {
+        article.value.views = result.views
+        article.value.likes = result.likes
+      }
       localStorage.setItem(viewKey, '1')
     } catch {
       // Le compteur initial reste visible si l'incrémentation échoue.
@@ -128,6 +133,7 @@ async function toggleLike() {
       const result = await $fetch<{ likes: number }>(`/api/actualites/${encodeURIComponent(identifier)}/like`, { method: 'DELETE' })
       isLiked.value = false
       likeCount.value = result.likes
+      if (article.value) article.value.likes = result.likes
       localStorage.removeItem(likeKey)
     } catch {
       // L'état local ne change pas si Strapi ne répond pas.
@@ -137,6 +143,7 @@ async function toggleLike() {
       const result = await $fetch<{ likes: number }>(`/api/actualites/${encodeURIComponent(identifier)}/like`, { method: 'POST' })
       isLiked.value = true
       likeCount.value = result.likes
+      if (article.value) article.value.likes = result.likes
       localStorage.setItem(likeKey, '1')
     } catch {
       // L'état local ne change pas si Strapi ne répond pas.
@@ -442,9 +449,25 @@ useSeoMeta({
     </Teleport>
 
   </div>
+  <main v-else-if="articlePending" class="article-loading" role="status" aria-live="polite">
+    <div class="loading-skeleton loading-skeleton--hero" />
+    <div class="loading-skeleton loading-skeleton--line" />
+    <div class="loading-skeleton loading-skeleton--line loading-skeleton--short" />
+  </main>
 </template>
 
 <style scoped>
+/* ── État de chargement ─────────────────────────────────────── */
+.article-loading { max-width: 1100px; margin: 0 auto; padding: 48px 24px; }
+.loading-skeleton {
+  background: linear-gradient(90deg, #E9E7E0 25%, #F7F6F2 50%, #E9E7E0 75%);
+  background-size: 200% 100%; animation: article-skeleton-shimmer 1.2s infinite;
+}
+.loading-skeleton--hero { height: 360px; margin-bottom: 28px; }
+.loading-skeleton--line { height: 20px; margin: 14px 0; }
+.loading-skeleton--short { width: 60%; }
+@keyframes article-skeleton-shimmer { to { background-position: -200% 0; } }
+
 /* ════════════════════════════════════════
    BARRE DE PROGRESSION
 ════════════════════════════════════════ */

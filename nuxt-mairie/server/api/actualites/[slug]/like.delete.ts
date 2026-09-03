@@ -8,8 +8,10 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Article invalide' })
   }
 
-  return $fetch(
+  const response = await $fetch<any>(
     `${config.strapiUrl}/api/actualites/${encodeURIComponent(identifier)}/like`,
     { method: 'DELETE', headers: strapiHeaders() },
   )
+
+  return response?.data ?? response
 })

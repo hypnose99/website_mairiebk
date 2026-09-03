@@ -24,7 +24,17 @@ export default defineEventHandler(async (event) => {
 
     params.append('sort[0]', 'publishedAt:desc')
     params.append('pagination[pageSize]', String(Number(query.perPage) || 100))
-    params.append('populate', '*')
+    if (query.detail) {
+      params.append('populate[0]', 'image')
+      params.append('populate[1]', 'galerie')
+    }
+    else {
+      params.append('populate', 'image')
+    }
+
+    if (query.slug) {
+      params.append('filters[documentId][$eq]', query.slug as string)
+    }
 
     const response = await $fetch<any>(
       `${config.strapiUrl}/api/projets?${params}`,

@@ -27,26 +27,38 @@ export default defineEventHandler(async (event) => {
 
   params.append('populate', '*')
 
-  const response = await $fetch<any>(
-    `${config.strapiUrl}/api/actualites?${params}`,
-    { headers: strapiHeaders() }
-  )
+  try {
+    const response = await $fetch<any>(
+      `${config.strapiUrl}/api/actualites?${params}`,
+      { headers: strapiHeaders() }
+    )
 
-  const items = (response.data ?? []).map((item: any) =>
-    transformActualite(item, config.strapiUrl)
-  )
-  const sortedItems = items.sort((a: any, b: any) => {
-    const dateA = new Date(a.date_publication || a.publishedAt || 0).getTime()
-    const dateB = new Date(b.date_publication || b.publishedAt || 0).getTime()
-    return dateB - dateA
-  })
-  const start = (page - 1) * perPage
-  const paginatedItems = sortedItems.slice(start, start + perPage)
+    const items = (response.data ?? []).map((item: any) =>
+      transformActualite(item, config.strapiUrl)
+    )
+    let sortedItems = items.sort((a: any, b: any) => {
+      const dateA = new Date(a.date_publication || a.publishedAt || 0).getTime()
+      const dateB = new Date(b.date_publication || b.publishedAt || 0).getTime()
+      return dateB - dateA
+    })
+    // "À la une" : ne garder que les articles marqués `featured` dans Strapi
+    if (query.featured === 'true') {
+      sortedItems = sortedItems.filter((a: any) => a.featured)
+    }
+    const start = (page - 1) * perPage
+    const paginatedItems = sortedItems.slice(start, start + perPage)
 
-  return {
-    items:   paginatedItems,
-    total:   sortedItems.length,
-    page,
-    perPage,
+    return {
+      items:   paginatedItems,
+      total:   sortedItems.length,
+      page,
+      perPage,
+    }
+  }
+  catch (err: any) {
+    // Ne jamais faire tomber la page : on log et on renvoie une liste vide
+    // (même comportement que /api/evenements et /api/flash-info)
+    console.error('[api/actualites] Strapi error:', err?.statusCode ?? err?.message)
+    return { items: [], total: 0, page, perPage }
   }
 })

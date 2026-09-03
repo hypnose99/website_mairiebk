@@ -107,7 +107,7 @@ export function transformProject(item: any, strapiBase: string) {
   const title = item.titre ?? item.title ?? ''
 
   // Galerie : médias uploadés (galerie/gallery/images) ou URLs texte temporaires (imagesUrls JSON)
-  const rawGallery = item.galerie ?? item.gallery ?? item.images ?? []
+  const rawGallery = item.galerie?.data ?? item.galerie ?? item.gallery?.data ?? item.gallery ?? item.images ?? []
   const mediaImages = (Array.isArray(rawGallery) ? rawGallery : []).map((g: any) => ({
     src:     mediaUrl(g, strapiBase),
     alt:     g.alternativeText ?? title,
@@ -136,13 +136,15 @@ export function transformProject(item: any, strapiBase: string) {
     slug:            item.slug ?? item.documentId ?? String(item.id),
     title,
     description:     item.resume ?? item.description ?? '',
+    resume:          item.resume ?? item.description ?? '',
     content:         item.contenu ?? item.content ?? '',
     category:        item.categorie ?? item.category ?? '',
     budget:          item.budget ?? '',
-    dateDebut:       item.dateDebut ?? null,
-    dateFin:         item.dateFin ?? null,
-    maitreOuvrage:   item.maitreOuvrage ?? '',
-    financement:     item.bailleur ?? item.financement ?? '',
+    dateDebut:       item.dateDebut ?? item.date_debut ?? null,
+    dateFin:         item.dateFin ?? item.date_fin ?? null,
+    maitreOuvrage:   item.maitreOuvrage ?? item.maitre_ouvrage ?? '',
+    financement:     item.bailleur ?? item.bailleurs ?? item.financement ?? '',
+    bailleurs:       item.bailleurs ?? item.bailleur ?? '',
     entreprises:     item.entreprises ?? '',
     livraisonPrevue: item.livraisonPrevue ?? '',
     progressPercent: item.progression ?? item.progressPercent ?? 0,
@@ -164,6 +166,8 @@ export function transformFlashInfo(item: any) {
     contenu: item.contenu,
     type:    item.type ?? 'info',
     actif:   item.actif ?? true,
+    datePublication: item.datePublication ?? item.publishedAt ?? null,
+    image:   mediaUrl(item.image, useRuntimeConfig().strapiUrl),
   }
 }
 
@@ -176,6 +180,11 @@ function formatDateBadge(dt: string): string {
   return `${day} ${month}`
 }
 
+function formatTime(dt: string | null): string {
+  if (!dt) return ''
+  return new Date(dt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+}
+
 /** Transforme un item Strapi 5 Evenement → format Nuxt */
 export function transformEvenement(item: any, strapiBase: string) {
   const coverImage = resolveCoverImage(item, strapiBase)
@@ -183,11 +192,14 @@ export function transformEvenement(item: any, strapiBase: string) {
     id:          item.documentId ?? String(item.id),
     titre:       item.titre ?? '',
     description: item.description ?? '',
+    contenu:     item.contenu ?? item.description ?? '',
     dateDebut:   item.dateDebut ?? null,
     dateFin:     item.dateFin ?? null,
     dateBadge:   formatDateBadge(item.dateDebut),
+    heure:       formatTime(item.dateDebut),
     lieu:        item.lieu ?? '',
     categorie:   item.categorie ?? '',
+    image:       coverImage,
     coverImage,
     featured:    item.featured ?? false,
     href:        '/evenements',

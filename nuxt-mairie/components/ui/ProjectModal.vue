@@ -2,7 +2,7 @@
 // components/ui/ProjectModal.vue — Grand popup détail projet
 import type { Project } from '~/types'
 
-const props = defineProps<{ project: Project | null }>()
+const props = defineProps<{ project: Project | null; pending?: boolean }>()
 const emit = defineEmits<{ close: [] }>()
 
 const isOpen = computed(() => props.project !== null)
@@ -60,7 +60,7 @@ const metaItems = computed(() => [
   { icon: 'fa-solid fa-layer-group',         label: 'Catégorie',         value: categoryLabel.value },
   { icon: 'fa-solid fa-coins',               label: 'Budget',            value: props.project?.budget },
   { icon: 'fa-solid fa-landmark',            label: 'Maître d\'ouvrage',  value: props.project?.maitreOuvrage },
-  { icon: 'fa-solid fa-hand-holding-dollar', label: 'Bailleur',          value: props.project?.financement },
+  { icon: 'fa-solid fa-hand-holding-dollar', label: 'Bailleur(s)',        value: props.project?.bailleurs ?? props.project?.financement },
   { icon: 'fa-solid fa-helmet-safety',       label: 'Entreprises',       value: props.project?.entreprises },
   { icon: 'fa-solid fa-calendar-day',        label: 'Début des travaux', value: fmtDate(props.project?.dateDebut) },
   { icon: 'fa-solid fa-flag-checkered',      label: 'Fin prévue',        value: fmtDate(props.project?.dateFin) },
@@ -123,6 +123,9 @@ onUnmounted(() => {
               <h2 class="pm-hero__title pm-anim" style="--d: 0.18s">{{ project.title }}</h2>
               <div v-if="project.budget" class="pm-hero__budget pm-anim" style="--d: 0.26s">
                 <i class="fa-solid fa-coins" /> {{ project.budget }}
+              </div>
+              <div v-if="pending" class="pm-loading-badge pm-anim" style="--d: 0.3s">
+                <span class="pm-loading-badge__dot" /> Chargement de la fiche complète…
               </div>
             </div>
 
@@ -345,6 +348,21 @@ onUnmounted(() => {
   color: #F5A623;
   font-size: 0.95rem;
   font-weight: 800;
+}
+.pm-loading-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.pm-loading-badge__dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #F5A623;
+  animation: pmPulse 1.2s infinite;
 }
 
 /* Miniatures */

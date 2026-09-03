@@ -34,8 +34,25 @@ const stats = computed(() => {
 })
 
 // ── Popup détail ─────────────────────────────────────────────────────────────
+// Ouverture immédiate avec les données déjà connues (liste), puis enrichissement
+// (galerie complète) en arrière-plan : le popup n'attend plus la requête Strapi.
 const selectedProject = ref<Project | null>(null)
-const openProject  = (p: Project) => { selectedProject.value = p }
+const projectDetailPending = ref(false)
+const openProject = async (p: Project) => {
+  selectedProject.value = p
+  projectDetailPending.value = true
+  try {
+    const detail = await $fetch<Project[]>('/api/projects', {
+      query: { slug: p.slug, detail: true, perPage: 1 },
+    })
+    if (selectedProject.value?.slug === p.slug) {
+      selectedProject.value = detail[0] ?? p
+    }
+  }
+  finally {
+    projectDetailPending.value = false
+  }
+}
 const closeProject = () => { selectedProject.value = null }
 </script>
 
@@ -127,7 +144,7 @@ const closeProject = () => { selectedProject.value = null }
     </div>
 
     <!-- ░░ POPUP DÉTAIL ░░ -->
-    <UiProjectModal :project="selectedProject" @close="closeProject" />
+    <UiProjectModal :project="selectedProject" :pending="projectDetailPending" @close="closeProject" />
   </div>
 </template>
 

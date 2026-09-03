@@ -1,22 +1,34 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 
 export interface Evenement {
   id: string
   titre: string
-  description: string
   dateBadge: string
+  heure: string
+  lieu: string
+  image: string | null
   coverImage: string | null
   href: string
 }
 
-const props = defineProps<{ events: Evenement[] }>()
+const props = defineProps<{ events: Evenement[]; pending?: boolean }>()
+const emit = defineEmits<{ open: [event: Evenement] }>()
 
 const idx = ref(0)
 const ev  = computed(() => props.events[idx.value])
 
-function prev() { idx.value = (idx.value - 1 + props.events.length) % props.events.length }
-function next() { idx.value = (idx.value + 1) % props.events.length }
+function prev() {
+  if (props.events.length > 1) idx.value = (idx.value - 1 + props.events.length) % props.events.length
+}
+function next() {
+  if (props.events.length > 1) idx.value = (idx.value + 1) % props.events.length
+}
+
+watch(() => props.events.length, (length) => {
+  if (length === 0) idx.value = 0
+  else if (idx.value >= length) idx.value = 0
+})
 
 let timer: ReturnType<typeof setInterval>
 onMounted(() => { timer = setInterval(next, 4000) })
@@ -27,26 +39,33 @@ onUnmounted(() => clearInterval(timer))
   <div class="side-block">
     <p class="block-label">Événements à venir</p>
 
-    <div v-if="events.length === 0" class="ev-empty">
+    <div v-if="pending && events.length === 0" class="ev-skeleton" role="status" aria-live="polite">
+      <div class="ev-skeleton__img" />
+      <div class="ev-skeleton__body">
+        <div class="ev-skeleton__line ev-skeleton__line--title" />
+        <div class="ev-skeleton__line ev-skeleton__line--short" />
+      </div>
+    </div>
+
+    <div v-else-if="events.length === 0" class="ev-empty">
       Aucun événement à venir.
     </div>
 
     <div v-else class="vue-carousel">
       <div class="vc-stage-wrap">
         <Transition name="ev-slide" mode="out-in">
-          <div :key="idx" class="ev-card">
+          <div :key="idx" class="ev-card cursor-pointer" role="button" tabindex="0" @click="emit('open', ev)" @keydown.enter="emit('open', ev)">
             <div class="ev-img-wrap">
-              <img
-                :src="ev.coverImage ?? 'https://images.unsplash.com/photo-1486325212027-8081e485255e?auto=format&fit=crop&w=600&q=80'"
-                :alt="ev.titre"
-                class="ev-img"
-              />
+              <img v-if="ev.image" :src="ev.image" :alt="ev.titre" class="ev-img" />
               <span class="ev-badge">{{ ev.dateBadge }}</span>
             </div>
             <div class="ev-body">
               <p class="ev-title">{{ ev.titre }}</p>
-              <p class="ev-sub">{{ ev.description }}</p>
-              <a :href="ev.href" class="ev-link">Détails →</a>
+              <div class="ev-meta">
+                <span v-if="ev.heure"><i class="bi bi-clock" /> {{ ev.heure }}</span>
+                <span v-if="ev.lieu"><i class="bi bi-geo-alt" /> {{ ev.lieu }}</span>
+              </div>
+              <NuxtLink :to="ev.href" class="ev-link" @click.stop> Détails →</NuxtLink>
             </div>
           </div>
         </Transition>
@@ -78,6 +97,21 @@ onUnmounted(() => clearInterval(timer))
   letter-spacing: 0.16em; color: #009640; margin-bottom: 20px;
 }
 .ev-empty { font-size: 0.85rem; color: #999; padding: 20px 0; }
+
+/* ── Skeleton (chargement lazy) ─────────────────────────────────────── */
+.ev-skeleton { background: white; border: 1px solid #EBEBEB; }
+.ev-skeleton__img,
+.ev-skeleton__line {
+  background: linear-gradient(90deg, #EBEBEB 25%, #F7F7F5 50%, #EBEBEB 75%);
+  background-size: 200% 100%;
+  animation: ev-shimmer 1.2s infinite;
+}
+.ev-skeleton__img { height: 175px; }
+.ev-skeleton__body { padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+.ev-skeleton__line { height: 12px; border-radius: 4px; }
+.ev-skeleton__line--title { width: 70%; height: 16px; }
+.ev-skeleton__line--short { width: 45%; }
+@keyframes ev-shimmer { to { background-position: -200% 0; } }
 .vue-carousel { display: flex; flex-direction: column; gap: 12px; }
 .vc-stage-wrap { position: relative; overflow: hidden; min-height: 255px; }
 
@@ -92,7 +126,8 @@ onUnmounted(() => clearInterval(timer))
 }
 .ev-body { padding: 20px; }
 .ev-title { font-size: 1.05rem; font-weight: 700; color: #0D0D0D; margin: 0 0 6px; text-transform: uppercase; }
-.ev-sub { font-size: 0.88rem; color: #555; margin: 0 0 14px; line-height: 1.5; }
+.ev-meta { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; color: #777; font-size: 0.78rem; }
+.ev-meta i { color: #009640; margin-right: 5px; }
 .ev-link { font-size: 0.8rem; font-weight: 700; color: #009640; text-decoration: none; text-transform: uppercase; }
 
 .vc-controls { display: flex; flex-direction: row; align-items: center; justify-content: space-between; }

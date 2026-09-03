@@ -16,6 +16,16 @@
   --transition: 0.25s ease;
 }
 
+/* ── Transitions de page (globales, cf. nuxt.config.ts) ───────── */
+.page-enter-active,
+.page-leave-active {
+  transition: opacity 0.3s ease;
+}
+.page-enter-from,
+.page-leave-to {
+  opacity: 0;
+}
+
 /* ── Reset & Base ───────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; }
 

@@ -9,11 +9,7 @@ export default defineEventHandler(async (event) => {
     const params = new URLSearchParams()
     params.append('sort[0]', 'dateDebut:asc')
     params.append('pagination[pageSize]', String(Number(query.perPage) || 6))
-    params.append('populate', '*')
-
-    // Filtre : événements à venir uniquement (dateDebut >= aujourd'hui)
-    const today = new Date().toISOString()
-    params.append('filters[dateDebut][$gte]', today)
+    params.append('populate', 'image')
 
     const response = await $fetch<any>(
       `${config.strapiUrl}/api/evenements?${params}`,

@@ -4,19 +4,19 @@ module.exports = {
   routes: [
     {
       method: 'POST',
-      path: '/actualites/:identifier/view',
+      path: '/actualites/:id/view',
       handler: 'actualite.incrementView',
       config: { auth: false },
     },
     {
       method: 'POST',
-      path: '/actualites/:identifier/like',
+      path: '/actualites/:id/like',
       handler: 'actualite.incrementLike',
       config: { auth: false },
     },
     {
       method: 'DELETE',
-      path: '/actualites/:identifier/like',
+      path: '/actualites/:id/like',
       handler: 'actualite.decrementLike',
       config: { auth: false },
     },

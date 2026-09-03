@@ -10,7 +10,7 @@ module.exports = ({ env }) => ({
       ssl: { rejectUnauthorized: false },
       schema: 'public',
     },
-    pool: { min: 2, max: 10 },
+    pool: { min: 0, max: 10 },
     acquireConnectionTimeout: 60000,
   },
 });

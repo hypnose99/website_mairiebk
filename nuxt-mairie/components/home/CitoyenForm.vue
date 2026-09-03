@@ -1,11 +1,11 @@
 <script setup lang="ts">
-const form = reactive({ nom: '', prenom: '', tel: '' })
+const form = reactive({ nom: '', tel: '' })
 const submitted = ref(false)
 
 const submit = async () => {
   // TODO: connecter à l'API admin
   submitted.value = true
-  setTimeout(() => { submitted.value = false; Object.assign(form, { nom: '', prenom: '', tel: '' }) }, 3000)
+  setTimeout(() => { submitted.value = false; Object.assign(form, { nom: '', tel: '' }) }, 3000)
 }
 </script>
 
@@ -20,12 +20,8 @@ const submit = async () => {
         </div>
         <form v-else class="reg-form" @submit.prevent="submit">
           <div class="reg-field">
-            <label class="reg-label" for="reg-nom"><i class="bi bi-person-fill" /> Nom</label>
-            <input id="reg-nom" v-model="form.nom" type="text" class="reg-input" placeholder="Votre nom" required />
-          </div>
-          <div class="reg-field">
-            <label class="reg-label" for="reg-prenom"><i class="bi bi-person" /> Prénom</label>
-            <input id="reg-prenom" v-model="form.prenom" type="text" class="reg-input" placeholder="Votre prénom" required />
+            <label class="reg-label" for="reg-nom"><i class="bi bi-person-fill" /> Nom et prénom</label>
+            <input id="reg-nom" v-model="form.nom" type="text" class="reg-input" placeholder="Votre nom et prénom" required />
           </div>
           <div class="reg-field">
             <label class="reg-label" for="reg-tel"><i class="bi bi-telephone-fill" /> Numéro</label>

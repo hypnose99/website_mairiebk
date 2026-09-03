@@ -58,11 +58,13 @@ export interface Project {
   description: string
   content?: string
   category?: string
+  resume?: string
   budget?: string
   dateDebut?: string | null
   dateFin?: string | null
   maitreOuvrage?: string
   financement?: string
+  bailleurs?: string
   entreprises?: string
   livraisonPrevue?: string
   progressPercent: number

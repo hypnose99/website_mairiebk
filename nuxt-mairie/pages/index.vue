@@ -9,10 +9,9 @@ const { d } = useI18n()
 
 const getArticleDate = (article: any) => article.date_publication || article.publishedAt
 
-const { data: actualitesData } = useFetch('/api/actualites', {
+const { data: actualitesData, pending: actualitesPending } = useLazyFetch('/api/actualites', {
   query: { perPage: 8 },
   key: 'home-actualites',
-  lazy: true,
 })
 
 const articles = computed(() =>
@@ -27,13 +26,17 @@ const articles = computed(() =>
   }))
 )
 
-// Article à la une (premier featured)
-const { data: featuredData } = useFetch('/api/actualites', {
-  query: { perPage: 1 },
+// Article à la une : le plus récent des articles marqués `featured` dans Strapi.
+// Repli sur l'article le plus récent (toutes catégories) si aucun n'est marqué.
+const { data: featuredData, pending: featuredPending } = useLazyFetch('/api/actualites', {
+  query: { perPage: 1, featured: true },
   key: 'home-featured',
-  lazy: true,
 })
-const featuredArticle = computed(() => featuredData.value?.items?.[0])
+const featuredArticle = computed(() =>
+  featuredData.value?.items?.[0] ?? actualitesData.value?.items?.[0]
+)
+// Pas de contenu factice : tant que Strapi n'a pas répondu, on affiche un skeleton (cf. template)
+// plutôt qu'un article bidon qui clignoterait avant d'être remplacé par le vrai.
 const postDuJour = computed(() => featuredArticle.value ? {
   category: featuredArticle.value.categoryLabel,
   date:     d(new Date(getArticleDate(featuredArticle.value)), 'long'),
@@ -43,39 +46,91 @@ const postDuJour = computed(() => featuredArticle.value ? {
   href:     `/actualites/${featuredArticle.value.slug}`,
   author:   featuredArticle.value.author,
   readTime: '3 min',
-} : {
-  category: 'À la une', date: '',
-  title: 'Bouaké lance son programme de rénovation urbaine 2026–2030',
-  excerpt: 'Le maire de Bouaké a officiellement lancé ce matin le grand programme de rénovation urbaine.',
-  img: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?auto=format&fit=crop&w=900&q=80',
-  href: '/actualites', author: 'Service Communication', readTime: '3 min',
-})
+} : null)
 
 // ── Flash infos depuis Strapi ──────────────────────────────────────────────
-const { data: flashData } = useFetch('/api/flash-info', { key: 'home-flash', lazy: true })
-const flashes = computed(() =>
-  (flashData.value ?? []).length > 0
-    ? (flashData.value ?? []).map((f: any) => ({ cat: f.type.toUpperCase(), msg: f.contenu }))
-    : [
-        { cat: 'INFO', msg: 'Bienvenue sur le site officiel de la Mairie de Bouaké.' },
-      ]
-)
+const { data: flashData, pending: flashPending } = useLazyFetch('/api/flash-info', { key: 'home-flash' })
+const flashes = computed(() => {
+  const items = flashData.value ?? []
+  if (items.length > 0) {
+    return items.map((f: any) => ({
+      id: f.id,
+      cat: f.type.toUpperCase(),
+      msg: f.contenu,
+      titre: f.titre,
+      contenu: f.contenu,
+      datePublication: f.datePublication,
+      image: f.image,
+    }))
+  }
+  // Tant que la requête est en cours, on n'affiche pas encore le message
+  // par défaut : le composant montre son skeleton via la prop `pending`.
+  if (flashPending.value) return []
+  return [{ cat: 'INFO', msg: 'Bienvenue sur le site officiel de la Mairie de Bouaké.' }]
+})
 
 // ── Événements depuis Strapi ───────────────────────────────────────
-const { data: evenementsData } = useFetch('/api/evenements', {
+const { data: evenementsData, pending: evenementsPending } = useLazyFetch('/api/evenements', {
   query: { perPage: 6 },
   key: 'home-evenements',
-  lazy: true,
 })
 const events = computed(() => evenementsData.value ?? [])
+// Post du jour, Événements et Flash Info ont chacun leur propre skeleton (voir template) ;
+// ce bandeau ne couvre plus que la section "Actualités récentes" plus bas, qui n'en a pas.
+const homeDataPending = computed(() => actualitesPending.value)
 
-const projets = [
-  { id: 'grand-marche', label: 'Grand Marché de Bouaké', title: 'Grand Marché de Bouaké', image: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=80', text: 'Le Grand Marché de Bouaké est le poumon économique de la ville. La reconstruction en cours vise à en faire le plus grand marché de gros et de détail d\'Afrique de l\'Ouest, entièrement sécurisé et doté d\'une zone logistique moderne.', docs: [{ icon: '📄', label: 'Formulaire de demande d\'acte', size: 'PDF – 1.2 Mo' }, { icon: '📋', label: 'Liste des pièces à fournir', size: 'PDF – 0.5 Mo' }] },
-  { id: 'gare-routiere', label: 'Gare Routière', title: 'Gare Routière de Bouaké', image: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=80', text: 'La nouvelle gare routière regroupera tous les transports interurbains dans un espace moderne et sécurisé.', docs: [] },
-  { id: 'mobilite', label: 'Mobilité urbaine', title: 'Mobilité urbaine à Bouaké', image: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=800&q=80', text: 'Un réseau de transport en commun moderne pour desservir tous les quartiers de la ville.', docs: [] },
-  { id: 'sante', label: 'Santé', title: 'Infrastructures Sanitaires', image: 'https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?auto=format&fit=crop&w=800&q=80', text: 'Construction de nouvelles infrastructures sanitaires et équipement des centres de santé existants.', docs: [] },
-  { id: 'taxes', label: 'Digitalisation des Taxes', title: 'Digitalisation des Taxes', image: 'https://images.unsplash.com/photo-1556742049-0cfed4f7a07d?auto=format&fit=crop&w=800&q=80', text: 'Paiement en ligne des taxes locales et accompagnement à la création d\'entreprise à Bouaké.', docs: [{ icon: '🏪', label: 'Barème des taxes locales 2024', size: 'PDF – 3.0 Mo' }] },
-]
+const isEventModalOpen = ref(false)
+const isFlashModalOpen = ref(false)
+const selectedEvent = ref<any | null>(null)
+const selectedFlash = ref<any | null>(null)
+
+function openEventModal(event: any) {
+  selectedEvent.value = event
+  isEventModalOpen.value = true
+}
+
+function closeEventModal() {
+  isEventModalOpen.value = false
+  selectedEvent.value = null
+}
+
+function openFlashModal(flash: any) {
+  selectedFlash.value = flash
+  isFlashModalOpen.value = true
+}
+
+function closeFlashModal() {
+  isFlashModalOpen.value = false
+  selectedFlash.value = null
+}
+
+function closeModalsOnEscape(event: KeyboardEvent) {
+  if (event.key === 'Escape') {
+    closeEventModal()
+    closeFlashModal()
+  }
+}
+
+onMounted(() => window.addEventListener('keydown', closeModalsOnEscape))
+onUnmounted(() => window.removeEventListener('keydown', closeModalsOnEscape))
+
+const formatModalDate = (date?: string | null) =>
+  date ? new Date(date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' }) : ''
+
+const { projects: projectsData } = useProjects()
+const projets = computed(() => projectsData.value?.slice(0, 5).map(project => ({
+  id: project.id,
+  label: project.title,
+  title: project.title,
+  image: project.coverImage,
+  text: project.resume ?? project.description,
+  status: project.status,
+  category: project.category,
+  dateDebut: project.dateDebut,
+  dateFin: project.dateFin,
+  maitreOuvrage: project.maitreOuvrage,
+  bailleurs: project.bailleurs ?? project.financement,
+})) ?? [])
 
 const queFaireTabs = [
   { id: 'hotels', label: '🏨 Hôtels', lieux: [
@@ -190,21 +245,58 @@ const investCards = [
 
         <!-- Colonne gauche : événements -->
         <div class="col-side">
-          <HomeEventCarousel :events="events" />
+          <HomeEventCarousel :events="events" :pending="evenementsPending" @open="openEventModal" />
         </div>
 
         <!-- Colonne centrale : Post du jour -->
         <div class="col-center-anim">
-          <HomePostDuJour :post="postDuJour" />
+          <HomePostDuJour :post="postDuJour" :pending="featuredPending" />
         </div>
 
         <!-- Colonne droite : Flash Info + Formulaire citoyen -->
         <div class="col-form">
-          <HomeFlashInfo :flashes="flashes" />
+          <HomeFlashInfo :flashes="flashes" :pending="flashPending" @open="openFlashModal" />
           <HomeCitoyenForm />
         </div>
       </div>
     </section>
+
+    <Teleport to="body">
+      <Transition name="modal">
+        <div v-if="isEventModalOpen && selectedEvent" class="home-modal" role="dialog" aria-modal="true" aria-labelledby="event-modal-title" @click.self="closeEventModal">
+          <article class="home-modal__panel">
+            <button class="home-modal__close" type="button" aria-label="Fermer" @click="closeEventModal">×</button>
+            <img v-if="selectedEvent.image" :src="selectedEvent.image" :alt="selectedEvent.titre" class="home-modal__image" />
+            <div class="home-modal__body">
+              <p class="home-modal__eyebrow">Événement à venir</p>
+              <h2 id="event-modal-title">{{ selectedEvent.titre }}</h2>
+              <div class="home-modal__details">
+                <span v-if="selectedEvent.dateDebut"><i class="bi bi-calendar3" /> Début : {{ formatModalDate(selectedEvent.dateDebut) }}</span>
+                <span v-if="selectedEvent.dateFin"><i class="bi bi-calendar3" /> Fin : {{ formatModalDate(selectedEvent.dateFin) }}</span>
+                <span v-if="selectedEvent.heure"><i class="bi bi-clock" /> {{ selectedEvent.heure }}</span>
+                <span v-if="selectedEvent.lieu"><i class="bi bi-geo-alt" /> {{ selectedEvent.lieu }}</span>
+              </div>
+              <p v-if="selectedEvent.contenu || selectedEvent.description" class="home-modal__text">{{ selectedEvent.contenu || selectedEvent.description }}</p>
+            </div>
+          </article>
+        </div>
+      </Transition>
+
+      <Transition name="modal">
+        <div v-if="isFlashModalOpen && selectedFlash" class="home-modal" role="dialog" aria-modal="true" aria-labelledby="flash-modal-title" @click.self="closeFlashModal">
+          <article class="home-modal__panel">
+            <button class="home-modal__close" type="button" aria-label="Fermer" @click="closeFlashModal">×</button>
+            <img v-if="selectedFlash.image" :src="selectedFlash.image" :alt="selectedFlash.titre || selectedFlash.cat" class="home-modal__image" />
+            <div class="home-modal__body">
+              <p class="home-modal__eyebrow">Flash Info</p>
+              <h2 id="flash-modal-title">{{ selectedFlash.titre || selectedFlash.cat }}</h2>
+              <p v-if="selectedFlash.datePublication" class="home-modal__date"><i class="bi bi-calendar3" /> Publié le {{ formatModalDate(selectedFlash.datePublication) }}</p>
+              <p class="home-modal__text">{{ selectedFlash.contenu || selectedFlash.msg }}</p>
+            </div>
+          </article>
+        </div>
+      </Transition>
+    </Teleport>
 
     <!-- ══════════════════════════════════════════════════════
          MOT DU MAIRE
@@ -232,7 +324,11 @@ const investCards = [
     <!-- ══════════════════════════════════════════════════════
          ACTUALITÉS RÉCENTES
     ══════════════════════════════════════════════════════ -->
-    <HomeActualitesSection :articles="articles" />
+    <div v-if="homeDataPending" class="home-data-loading" role="status" aria-live="polite">
+      <span class="loading-spinner" />
+      Chargement des actualités...
+    </div>
+    <HomeActualitesSection v-else :articles="articles" />
 
     <!-- ══════════════════════════════════════════════════════
          PROJETS DE LA VILLE
@@ -650,57 +746,11 @@ const investCards = [
 .flash-msg { font-size: 0.85rem; color: var(--gray-700); line-height: 1.5; margin: 0 0 10px; }
 .flash-link { font-size: 0.74rem; font-weight: var(--fw-bold); color: var(--green); text-decoration: none; text-transform: uppercase; letter-spacing: 0.06em; }
 
-/* ── Post du jour ────────────────────────────────────────────────── */
-.col-chart { display: flex; align-items: center; padding: 16px 20px; }
-.pdj-card {
-  display: flex;
-  flex-direction: column;
-  background: white;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-  width: 100%;
-  transition: box-shadow 0.3s;
-}
-.pdj-card:hover { box-shadow: 0 8px 36px rgba(0,0,0,0.13); }
-.pdj-img-wrap { position: relative; display: block; overflow: hidden; height: 320px; flex-shrink: 0; }
-.pdj-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
-.pdj-card:hover .pdj-img { transform: scale(1.04); }
-.pdj-category {
-  position: absolute; top: 14px; left: 14px;
-  background: var(--orange); color: white;
-  font-size: 0.68rem; font-weight: var(--fw-bold);
-  text-transform: uppercase; letter-spacing: 0.08em;
-  padding: 4px 10px; border-radius: 20px;
-}
-.pdj-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; flex: 1; }
-.pdj-meta { display: flex; align-items: center; gap: 8px; color: #888; font-size: 0.78rem; }
-.pdj-sep { color: #ccc; }
-.pdj-title {
-  font-size: 1.15rem;
-  font-weight: var(--fw-bold);
-  color: var(--dark);
-  line-height: 1.35;
-}
-.pdj-excerpt {
-  font-size: 0.875rem;
-  color: #555;
-  line-height: 1.65;
-  flex: 1;
-  display: -webkit-box;
-  -webkit-line-clamp: 4;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-.pdj-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 14px; border-top: 1px solid #f0f0f0; }
-.pdj-author { font-size: 0.78rem; color: #888; }
-.pdj-btn {
-  background: var(--orange); color: white;
-  font-size: 0.78rem; font-weight: var(--fw-bold);
-  padding: 8px 16px; border-radius: 6px;
-  text-decoration: none; transition: background 0.2s;
-}
-.pdj-btn:hover { background: #bf4400; }
+/* Post du jour : mise en page propre au composant HomePostDuJour (voir ce fichier).
+   Ne pas redéfinir .col-chart ici : en styles scoped Vue, la racine du composant
+   enfant hérite aussi de l'attribut de scope du parent, donc une règle .col-chart
+   définie ici entrerait en conflit avec celle du composant (c'était la cause du
+   désalignement vertical avec les colonnes Événements / Flash Info). */
 
 /* Menu column */
 /* ── FORMULAIRE ENREGISTREMENT ──────────────────────────────────── */
@@ -860,6 +910,49 @@ const investCards = [
 .inv-title { font-size: 0.9rem; font-weight: var(--fw-black); color: white; text-transform: uppercase; letter-spacing: 0.04em; margin: 0 0 10px; }
 .inv-text { font-size: 0.82rem; color: rgba(255,255,255,0.7); line-height: 1.6; margin: 0; }
 
+/* ── Modales contenu ────────────────────────────────────────────── */
+.home-modal {
+  position: fixed; inset: 0; z-index: 1050;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px; background: rgba(0, 0, 0, 0.56);
+}
+.home-modal__panel {
+  position: relative; width: min(680px, 100%); max-height: 90vh;
+  overflow-y: auto; background: white; border-top: 4px solid var(--green);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
+}
+.home-modal__close {
+  position: absolute; top: 14px; right: 14px; z-index: 1;
+  width: 36px; height: 36px; border: 1px solid var(--gray-200);
+  background: white; color: var(--black); font-size: 1.5rem; line-height: 1;
+  cursor: pointer;
+}
+.home-modal__close:hover { background: var(--gray-100); }
+.home-modal__image { display: block; width: 100%; max-height: 300px; object-fit: cover; }
+.home-modal__body { padding: 32px; }
+.home-modal__eyebrow {
+  margin: 0 0 10px; color: var(--orange); font-size: 0.68rem;
+  font-weight: var(--fw-black); text-transform: uppercase; letter-spacing: 0.14em;
+}
+.home-modal__body h2 { margin: 0 0 20px; color: var(--black); font-size: 1.5rem; line-height: 1.2; text-transform: uppercase; }
+.home-modal__details { display: flex; flex-wrap: wrap; gap: 8px 18px; padding: 16px 0; border-top: 1px solid var(--gray-200); border-bottom: 1px solid var(--gray-200); color: var(--gray-700); font-size: 0.8rem; }
+.home-modal__details i, .home-modal__date i { margin-right: 5px; color: var(--green); }
+.home-modal__date { margin: -8px 0 20px; color: var(--gray-500); font-size: 0.8rem; }
+.home-modal__text { margin: 24px 0 0; color: var(--gray-700); font-size: 0.95rem; line-height: 1.8; white-space: pre-line; }
+/* Fond : fondu (opacity) */
+.modal-enter-active, .modal-leave-active { transition: opacity 0.25s ease; }
+.modal-enter-from, .modal-leave-to { opacity: 0; }
+/* Boîte de contenu : légère mise à l'échelle (scale) */
+.modal-enter-active .home-modal__panel, .modal-leave-active .home-modal__panel { transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1); }
+.modal-enter-from .home-modal__panel, .modal-leave-to .home-modal__panel { transform: scale(0.94); }
+.home-data-loading { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 44px; color: var(--gray-700); font-size: 0.8rem; }
+.loading-spinner { width: 16px; height: 16px; border: 2px solid var(--gray-200); border-top-color: var(--green); border-radius: 50%; animation: home-spin 0.7s linear infinite; }
+@keyframes home-spin { to { transform: rotate(360deg); } }
+
+/* Le skeleton et l'état vide de "Post du jour" sont gérés par le composant
+   HomePostDuJour lui-même (voir components/home/PostDuJour.vue), au même
+   titre que EventCarousel.vue et FlashInfo.vue pour leurs propres colonnes. */
+
 /* ── Transitions ─────────────────────────────────────────────────── */
 .fade-tab-enter-active, .fade-tab-leave-active { transition: opacity 0.25s, transform 0.25s; }
 .fade-tab-enter-from, .fade-tab-leave-to { opacity: 0; transform: translateY(6px); }
@@ -892,5 +985,8 @@ const investCards = [
   .news-grid { grid-template-columns: 1fr; }
   .invest-grid { grid-template-columns: 1fr 1fr; }
   .disc-tabs { flex-wrap: wrap; }
+  .home-modal { padding: 12px; }
+  .home-modal__body { padding: 24px 20px; }
+  .home-modal__image { max-height: 220px; }
 }
 </style>

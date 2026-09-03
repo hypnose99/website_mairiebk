@@ -9,6 +9,8 @@ const { isOffline, activeNotifications } = storeToRefs(appStore)
 
 <template>
   <div id="app">
+    <NuxtLoadingIndicator color="linear-gradient(to right, #009640, #F77F00)" :height="3" />
+
     <!-- Bannière hors ligne -->
     <Transition name="slide-down">
       <div v-if="isOffline" class="offline-banner" role="alert">
@@ -91,17 +93,6 @@ const { isOffline, activeNotifications } = storeToRefs(appStore)
   cursor: pointer;
   font-size: 18px;
   padding: 0;
-}
-
-/* Transitions de page */
-.page-enter-active,
-.page-leave-active {
-  transition: opacity 0.25s, transform 0.25s;
-}
-.page-enter-from,
-.page-leave-to {
-  opacity: 0;
-  transform: translateY(8px);
 }
 
 .notif-enter-active, .notif-leave-active { transition: all 0.3s; }
