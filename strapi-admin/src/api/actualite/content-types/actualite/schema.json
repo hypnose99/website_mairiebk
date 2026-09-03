@@ -76,6 +76,9 @@
     },
     "coverImageUrl": {
       "type": "string"
+    },
+    "date_publication": {
+      "type": "date"
     }
   }
 }

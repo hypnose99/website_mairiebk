@@ -10,7 +10,7 @@ const props = defineProps<{
 const { d } = useI18n()
 
 const formattedDate = computed(() =>
-  d(new Date(props.article.publishedAt), 'short')
+  d(new Date(props.article.date_publication || props.article.publishedAt), 'short')
 )
 </script>
 

@@ -500,6 +500,7 @@ export interface ApiActualiteActualite extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    date_publication: Schema.Attribute.Date;
     excerpt: Schema.Attribute.Text;
     featured: Schema.Attribute.Boolean;
     gallery: Schema.Attribute.Media<

@@ -33,9 +33,13 @@ const featured = computed(() =>
 )
 
 const { d } = useI18n()
-const formattedDate = computed(() =>
-  article.value ? d(new Date(article.value.publishedAt), 'long') : ''
-)
+const getArticleDate = (article: any) => article.date_publication || article.publishedAt
+const formattedDate = computed(() => {
+  if (!article.value) return '';
+  // Utilise la date personnalisée en priorité, sinon la date automatique
+  const targetDate = getArticleDate(article.value);
+  return d(new Date(targetDate), 'long');
+})
 
 // Temps de lecture estimé
 const readingTime = computed(() => {
@@ -210,7 +214,7 @@ useSeoMeta({
           <span class="hero-meta-sep" />
           <span class="hero-meta-item">
             <i class="bi bi-calendar3" />
-            <time :datetime="article.publishedAt">{{ formattedDate }}</time>
+            <time :datetime="getArticleDate(article)">{{ formattedDate }}</time>
           </span>
           <span class="hero-meta-sep" />
           <span class="hero-meta-item"><i class="bi bi-clock" /> {{ readingTime }} min de lecture</span>
@@ -376,7 +380,7 @@ useSeoMeta({
               <img :src="rel.coverImage" :alt="rel.title" class="sidebar-card-img" />
               <div class="sidebar-card-body">
                 <p class="sidebar-card-title">{{ rel.title }}</p>
-                <span class="sidebar-card-date">{{ d(new Date(rel.publishedAt), 'short') }}</span>
+                <span class="sidebar-card-date">{{ d(new Date(getArticleDate(rel)), 'short') }}</span>
               </div>
             </NuxtLink>
           </div>

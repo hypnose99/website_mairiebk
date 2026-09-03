@@ -7,6 +7,8 @@ useSeoMeta({
 // ── Articles depuis Strapi ─────────────────────────────────────────────────
 const { d } = useI18n()
 
+const getArticleDate = (article: any) => article.date_publication || article.publishedAt
+
 const { data: actualitesData } = useFetch('/api/actualites', {
   query: { perPage: 8 },
   key: 'home-actualites',
@@ -19,7 +21,7 @@ const articles = computed(() =>
     coverImage:    a.coverImage ?? 'https://images.unsplash.com/photo-1486325212027-8081e485255e?auto=format&fit=crop&w=400&q=80',
     coverImageAlt: a.coverImageAlt ?? a.title,
     category:      a.categoryLabel,
-    date:          d(new Date(a.publishedAt), 'short'),
+    date:          d(new Date(getArticleDate(a)), 'short'),
     title:         a.title,
     href:          `/actualites/${a.slug}`,
   }))
@@ -34,7 +36,7 @@ const { data: featuredData } = useFetch('/api/actualites', {
 const featuredArticle = computed(() => featuredData.value?.items?.[0])
 const postDuJour = computed(() => featuredArticle.value ? {
   category: featuredArticle.value.categoryLabel,
-  date:     d(new Date(featuredArticle.value.publishedAt), 'long'),
+  date:     d(new Date(getArticleDate(featuredArticle.value)), 'long'),
   title:    featuredArticle.value.title,
   excerpt:  featuredArticle.value.excerpt,
   img:      featuredArticle.value.coverImage ?? 'https://images.unsplash.com/photo-1486325212027-8081e485255e?auto=format&fit=crop&w=900&q=80',

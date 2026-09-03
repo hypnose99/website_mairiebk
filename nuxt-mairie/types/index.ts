@@ -101,6 +101,7 @@ export interface Actualite {
   content: unknown       // Strapi Blocks ou HTML legacy
   category: ActualiteCategory
   categoryLabel: string
+  date_publication?: string | null
   publishedAt: string    // ISO 8601
   author: string
   coverImage: string

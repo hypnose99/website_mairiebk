@@ -34,11 +34,13 @@ watch([searchText, selCategory, selYear, selMonth], () => {
 
 const allArticles = computed<Actualite[]>(() => data.value?.items ?? [])
 
+const getArticleDate = (article: Actualite) => article.date_publication || article.publishedAt
+
 // Filtrage global (search / year / month)
 const globalFiltered = computed<Actualite[]>(() => {
   let r = allArticles.value
-  if (selYear.value)  r = r.filter(a => new Date(a.publishedAt).getFullYear() === Number(selYear.value))
-  if (selMonth.value) r = r.filter(a => new Date(a.publishedAt).getMonth() + 1 === Number(selMonth.value))
+  if (selYear.value)  r = r.filter(a => new Date(getArticleDate(a)).getFullYear() === Number(selYear.value))
+  if (selMonth.value) r = r.filter(a => new Date(getArticleDate(a)).getMonth() + 1 === Number(selMonth.value))
   if (searchText.value) {
     const q = searchText.value.toLowerCase()
     r = r.filter(a => a.title.toLowerCase().includes(q) || a.excerpt.toLowerCase().includes(q))
@@ -152,7 +154,7 @@ const MONTHS = [
             </span>
           </div>
           <div class="art-hero__body" :style="{ background: sec.accent }">
-            <span class="art-hero__date">{{ fmt(sec.articles[0].publishedAt) }}</span>
+            <span class="art-hero__date">{{ fmt(getArticleDate(sec.articles[0])) }}</span>
             <h2 class="art-hero__title">{{ sec.articles[0].title }}</h2>
             <p class="art-hero__excerpt">{{ sec.articles[0].excerpt }}</p>
             <span class="art-hero__cta">
@@ -193,7 +195,7 @@ const MONTHS = [
                     </span>
                   </div>
                   <div class="art-card__body">
-                    <span class="art-card__date">{{ fmt(art.publishedAt) }}</span>
+                    <span class="art-card__date">{{ fmt(getArticleDate(art)) }}</span>
                     <h3 class="art-card__title">{{ art.title }}</h3>
                     <span class="art-card__cta">
                       Lire <i class="fa-solid fa-arrow-right" />

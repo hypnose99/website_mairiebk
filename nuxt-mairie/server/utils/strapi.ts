@@ -85,6 +85,7 @@ export function transformActualite(item: any, strapiBase: string) {
     content,
     category:      item.category ?? '',
     categoryLabel: CATEGORY_LABELS[item.category] ?? item.category ?? '',
+    date_publication: item.date_publication ?? null,
     publishedAt:   item.publishedAt,
     author:        item.auteur ?? 'Service Communication',
     coverImage,

@@ -15,12 +15,15 @@ export default defineEventHandler(async (event) => {
     params.append('filters[$or][1][excerpt][$containsi]', query.search as string)
   }
 
-  params.append('sort[0]', 'publishedAt:desc')
-
+  // La date métier est prioritaire ; publishedAt reste le second critère pour
+  // les anciens articles qui n'ont pas encore de date_publication.
   const page    = Number(query.page)    || 1
   const perPage = Number(query.perPage) || 9
-  params.append('pagination[page]',     String(page))
-  params.append('pagination[pageSize]', String(perPage))
+  // Strapi ne permet pas de trier correctement une date personnalisée avec
+  // fallback quand certaines lignes ont une valeur NULL. On récupère les
+  // articles filtrés, puis on trie sur la date réellement affichée.
+  params.append('pagination[page]', '1')
+  params.append('pagination[pageSize]', '1000')
 
   params.append('populate', '*')
 
@@ -32,11 +35,18 @@ export default defineEventHandler(async (event) => {
   const items = (response.data ?? []).map((item: any) =>
     transformActualite(item, config.strapiUrl)
   )
+  const sortedItems = items.sort((a: any, b: any) => {
+    const dateA = new Date(a.date_publication || a.publishedAt || 0).getTime()
+    const dateB = new Date(b.date_publication || b.publishedAt || 0).getTime()
+    return dateB - dateA
+  })
+  const start = (page - 1) * perPage
+  const paginatedItems = sortedItems.slice(start, start + perPage)
 
   return {
-    items,
-    total:   response.meta?.pagination?.total    ?? items.length,
-    page:    response.meta?.pagination?.page     ?? page,
-    perPage: response.meta?.pagination?.pageSize ?? perPage,
+    items:   paginatedItems,
+    total:   sortedItems.length,
+    page,
+    perPage,
   }
 })

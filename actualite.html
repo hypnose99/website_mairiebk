@@ -1,0 +1,693 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Actualités - Mairie de Bouaké</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="header-non-fige">
+      <img src="images/logo.png" alt="Logo" class="logo-header" />
+      <nav>
+        <a href="index.html">Accueil</a>
+        <a href="elus.html">Le Maire</a>
+        <a href="#">La Mairie</a>
+        <a href="#">La Ville</a>
+        <a
+          href="actualites.html"
+          class="active"
+          style="color: var(--primary-green)"
+          >Actualités</a
+        >
+        <a href="#">Opportunités</a>
+      </nav>
+    </header>
+
+    <section class="magazine-section">
+      <div class="container">
+        <form class="news-filter-bar">
+          <input
+            type="text"
+            class="filter-search-input"
+            placeholder="Rechercher un mot-clé (ex: école, route...)"
+          />
+
+          <select class="filter-select">
+            <option value="">Toutes catégories</option>
+            <option value="urbanisme">Urbanisme & Travaux</option>
+            <option value="economie">Économie Locale</option>
+            <option value="education">Éducation & Jeunesse</option>
+            <option value="culture">Culture & Sport</option>
+          </select>
+
+          <select class="filter-select">
+            <option value="">Année</option>
+            <option value="2026">2026</option>
+            <option value="2025">2025</option>
+            <option value="2024">2024</option>
+          </select>
+
+          <select class="filter-select">
+            <option value="">Mois</option>
+            <option value="04">Avril</option>
+            <option value="03">Mars</option>
+            <option value="02">Février</option>
+            <option value="01">Janvier</option>
+          </select>
+
+          <button type="submit" class="filter-btn">Filtrer</button>
+        </form>
+
+        <div class="mag-category-block">
+          <h2 class="mag-section-title">Santé & Social</h2>
+
+          <div class="row g-4">
+            <div class="col-lg-6">
+              <a href="#" class="mag-featured-post">
+                <img
+                  src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1000&q=80"
+                  alt="Santé Publique"
+                />
+                <div class="mag-featured-overlay">
+                  <span class="mag-badge">Santé Publique</span>
+                  <span class="mag-date">• 18 Avril 2026</span>
+
+                  <h3 class="mag-featured-title mt-2">
+                    Le nouvel hôpital de référence ouvre enfin ses portes aux
+                    habitants
+                  </h3>
+                  <p class="mag-featured-excerpt">
+                    Équipé des dernières technologies médicales, ce centre
+                    permettra de soulager le CHU et d'offrir des soins de
+                    proximité de grande qualité...
+                  </p>
+                </div>
+              </a>
+            </div>
+
+            <div class="col-lg-6">
+              <div class="row g-4">
+                <div class="col-md-6">
+                  <div class="mag-small-post">
+                    <a href="#">
+                      <div class="mag-small-img-wrapper">
+                        <img
+                          src="https://images.unsplash.com/photo-1584362917165-526a968579e8?auto=format&fit=crop&w=600&q=80"
+                          alt="Vaccination"
+                        />
+                      </div>
+                    </a>
+                    <div class="mag-small-meta">
+                      <span class="mag-badge">Prévention</span>
+                      <span class="mag-date">16 Avr 2026</span>
+                    </div>
+                    <a href="#" class="mag-small-title"
+                      >Lancement de la grande campagne de vaccination
+                      gratuite</a
+                    >
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="mag-small-post">
+                    <a href="#">
+                      <div class="mag-small-img-wrapper">
+                        <img
+                          src="https://images.unsplash.com/photo-1538108149393-cebb47acddb2?auto=format&fit=crop&w=600&q=80"
+                          alt="Aide sociale"
+                        />
+                      </div>
+                    </a>
+                    <div class="mag-small-meta">
+                      <span class="mag-badge">Solidarité</span>
+                      <span class="mag-date">12 Avr 2026</span>
+                    </div>
+                    <a href="#" class="mag-small-title"
+                      >Distribution de vivres aux familles vulnérables du
+                      quartier Koko</a
+                    >
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="mag-small-post">
+                    <a href="#">
+                      <div class="mag-small-img-wrapper">
+                        <img
+                          src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=600&q=80"
+                          alt="Médecin"
+                        />
+                      </div>
+                    </a>
+                    <div class="mag-small-meta">
+                      <span class="mag-badge">Infrastructure</span>
+                      <span class="mag-date">08 Avr 2026</span>
+                    </div>
+                    <a href="#" class="mag-small-title"
+                      >Nouveau centre de santé communautaire inauguré à
+                      Dar-Es-Salam</a
+                    >
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="mag-small-post">
+                    <a href="#">
+                      <div class="mag-small-img-wrapper">
+                        <img
+                          src="https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?auto=format&fit=crop&w=600&q=80"
+                          alt="Séniors"
+                        />
+                      </div>
+                    </a>
+                    <div class="mag-small-meta">
+                      <span class="mag-badge">Action Sociale</span>
+                      <span class="mag-date">03 Avr 2026</span>
+                    </div>
+                    <a href="#" class="mag-small-title"
+                      >Mise en place d'un programme d'assistance pour le 3ème
+                      âge</a
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mag-category-block">
+          <h2 class="mag-section-title">Éducation & Jeunesse</h2>
+
+          <div class="row g-4">
+            <div class="col-lg-6">
+              <a href="#" class="mag-featured-post">
+                <img
+                  src="https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1000&q=80"
+                  alt="Éducation"
+                />
+                <div class="mag-featured-overlay">
+                  <span class="mag-badge">Excellence</span>
+                  <span class="mag-date">• 15 Avril 2026</span>
+
+                  <h3 class="mag-featured-title mt-2">
+                    Distribution de 10 000 kits scolaires pour la rentrée
+                  </h3>
+                  <p class="mag-featured-excerpt">
+                    La mairie renouvelle son engagement envers l'éducation en
+                    soutenant les élèves méritants et les familles en difficulté
+                    financière...
+                  </p>
+                </div>
+              </a>
+            </div>
+
+            <div class="col-lg-6">
+              <div class="row g-4">
+                <div class="col-md-6">
+                  <div class="mag-small-post">
+                    <a href="#">
+                      <div class="mag-small-img-wrapper">
+                        <img
+                          src="https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=600&q=80"
+                          alt="Bibliothèque"
+                        />
+                      </div>
+                    </a>
+                    <div class="mag-small-meta">
+                      <span class="mag-badge">Culture</span>
+                      <span class="mag-date">10 Avr 2026</span>
+                    </div>
+                    <a href="#" class="mag-small-title"
+                      >Réhabilitation de la grande bibliothèque municipale</a
+                    >
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="mag-small-post">
+                    <a href="#">
+                      <div class="mag-small-img-wrapper">
+                        <img
+                          src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=600&q=80"
+                          alt="Étudiants"
+                        />
+                      </div>
+                    </a>
+                    <div class="mag-small-meta">
+                      <span class="mag-badge">Université</span>
+                      <span class="mag-date">07 Avr 2026</span>
+                    </div>
+                    <a href="#" class="mag-small-title"
+                      >Signature d'une convention avec l'Université Alassane
+                      Ouattara</a
+                    >
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="mag-small-post">
+                    <a href="#">
+                      <div class="mag-small-img-wrapper">
+                        <img
+                          src="https://images.unsplash.com/photo-1588075592446-265fd1e6e76f?auto=format&fit=crop&w=600&q=80"
+                          alt="Cantine"
+                        />
+                      </div>
+                    </a>
+                    <div class="mag-small-meta">
+                      <span class="mag-badge">Social</span>
+                      <span class="mag-date">04 Avr 2026</span>
+                    </div>
+                    <a href="#" class="mag-small-title"
+                      >Inauguration de 3 nouvelles cantines scolaires</a
+                    >
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="mag-small-post">
+                    <a href="#">
+                      <div class="mag-small-img-wrapper">
+                        <img
+                          src="https://images.unsplash.com/photo-1529390079861-591de354faf5?auto=format&fit=crop&w=600&q=80"
+                          alt="Jeunesse"
+                        />
+                      </div>
+                    </a>
+                    <div class="mag-small-meta">
+                      <span class="mag-badge">Annonce</span>
+                      <span class="mag-date">01 Avr 2026</span>
+                    </div>
+                    <a href="#" class="mag-small-title"
+                      >Les résultats des bourses d'études municipales sont
+                      disponibles</a
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mag-category-block">
+          <h2 class="mag-section-title">Sport & Loisirs</h2>
+
+          <div class="row g-4">
+            <div class="col-lg-6">
+              <a href="#" class="mag-featured-post">
+                <img
+                  src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1000&q=80"
+                  alt="Marathon"
+                />
+                <div class="mag-featured-overlay">
+                  <span class="mag-badge">Événement</span>
+                  <span class="mag-date">• 12 Avril 2026</span>
+
+                  <h3 class="mag-featured-title mt-2">
+                    Le grand marathon de Bouaké rassemble plus de 5000
+                    participants
+                  </h3>
+                  <p class="mag-featured-excerpt">
+                    Une journée sportive mémorable qui a vu la participation de
+                    coureurs venus de toute la sous-région pour célébrer la
+                    cohésion sociale...
+                  </p>
+                </div>
+              </a>
+            </div>
+
+            <div class="col-lg-6">
+              <div class="row g-4">
+                <div class="col-md-6">
+                  <div class="mag-small-post">
+                    <a href="#">
+                      <div class="mag-small-img-wrapper">
+                        <img
+                          src="https://images.unsplash.com/photo-1518605368461-1e1e38dd1ba9?auto=format&fit=crop&w=600&q=80"
+                          alt="Football"
+                        />
+                      </div>
+                    </a>
+                    <div class="mag-small-meta">
+                      <span class="mag-badge">Football</span>
+                      <span class="mag-date">09 Avr 2026</span>
+                    </div>
+                    <a href="#" class="mag-small-title"
+                      >L'équipe locale se qualifie avec brio pour la finale du
+                      tournoi</a
+                    >
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="mag-small-post">
+                    <a href="#">
+                      <div class="mag-small-img-wrapper">
+                        <img
+                          src="https://images.unsplash.com/photo-1504450758481-7338eba7524a?auto=format&fit=crop&w=600&q=80"
+                          alt="Basket"
+                        />
+                      </div>
+                    </a>
+                    <div class="mag-small-meta">
+                      <span class="mag-badge">Compétition</span>
+                      <span class="mag-date">06 Avr 2026</span>
+                    </div>
+                    <a href="#" class="mag-small-title"
+                      >Succès du tournoi de basket-ball inter-quartiers (Édition
+                      2)</a
+                    >
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="mag-small-post">
+                    <a href="#">
+                      <div class="mag-small-img-wrapper">
+                        <img
+                          src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=600&q=80"
+                          alt="Stade"
+                        />
+                      </div>
+                    </a>
+                    <div class="mag-small-meta">
+                      <span class="mag-badge">Infrastructure</span>
+                      <span class="mag-date">02 Avr 2026</span>
+                    </div>
+                    <a href="#" class="mag-small-title"
+                      >Rénovation des plateaux sportifs d'Air France et de
+                      Koko</a
+                    >
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="mag-small-post">
+                    <a href="#">
+                      <div class="mag-small-img-wrapper">
+                        <img
+                          src="https://images.unsplash.com/photo-1576610616656-d3aa5d1f4534?auto=format&fit=crop&w=600&q=80"
+                          alt="Piscine"
+                        />
+                      </div>
+                    </a>
+                    <div class="mag-small-meta">
+                      <span class="mag-badge">Loisirs</span>
+                      <span class="mag-date">28 Mar 2026</span>
+                    </div>
+                    <a href="#" class="mag-small-title"
+                      >Ouverture d'une nouvelle piscine municipale ouverte au
+                      public</a
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mag-category-block">
+          <h2 class="mag-section-title">Politique & Administration</h2>
+
+          <div class="row g-4">
+            <div class="col-lg-6">
+              <a href="#" class="mag-featured-post">
+                <img
+                  src="https://images.unsplash.com/photo-1577415124269-dba114075b1b?auto=format&fit=crop&w=1000&q=80"
+                  alt="Conseil Municipal"
+                />
+                <div class="mag-featured-overlay">
+                  <span class="mag-badge">Institution</span>
+                  <span class="mag-date">• 05 Avril 2026</span>
+
+                  <h3 class="mag-featured-title mt-2">
+                    Le Conseil Municipal vote le budget de l'année à l'unanimité
+                  </h3>
+                  <p class="mag-featured-excerpt">
+                    Un budget record axé sur l'investissement, la voirie et le
+                    soutien aux initiatives sociales dans l'ensemble de la
+                    commune...
+                  </p>
+                </div>
+              </a>
+            </div>
+
+            <div class="col-lg-6">
+              <div class="row g-4">
+                <div class="col-md-6">
+                  <div class="mag-small-post">
+                    <a href="#">
+                      <div class="mag-small-img-wrapper">
+                        <img
+                          src="https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&w=600&q=80"
+                          alt="Réunion"
+                        />
+                      </div>
+                    </a>
+                    <div class="mag-small-meta">
+                      <span class="mag-badge">Dialogue</span>
+                      <span class="mag-date">01 Avr 2026</span>
+                    </div>
+                    <a href="#" class="mag-small-title"
+                      >Rencontre d'échanges entre le Maire et les chefs de
+                      quartiers</a
+                    >
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="mag-small-post">
+                    <a href="#">
+                      <div class="mag-small-img-wrapper">
+                        <img
+                          src="https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&w=600&q=80"
+                          alt="Documents"
+                        />
+                      </div>
+                    </a>
+                    <div class="mag-small-meta">
+                      <span class="mag-badge">Administration</span>
+                      <span class="mag-date">28 Mar 2026</span>
+                    </div>
+                    <a href="#" class="mag-small-title"
+                      >État civil : Nouvelles directives pour faciliter vos
+                      démarches</a
+                    >
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="mag-small-post">
+                    <a href="#">
+                      <div class="mag-small-img-wrapper">
+                        <img
+                          src="https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&w=600&q=80"
+                          alt="Ministre"
+                        />
+                      </div>
+                    </a>
+                    <div class="mag-small-meta">
+                      <span class="mag-badge">Gouvernement</span>
+                      <span class="mag-date">20 Mar 2026</span>
+                    </div>
+                    <a href="#" class="mag-small-title"
+                      >Visite officielle d'une délégation ministérielle à
+                      Bouaké</a
+                    >
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="mag-small-post">
+                    <a href="#">
+                      <div class="mag-small-img-wrapper">
+                        <img
+                          src="https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=600&q=80"
+                          alt="Tech"
+                        />
+                      </div>
+                    </a>
+                    <div class="mag-small-meta">
+                      <span class="mag-badge">Innovation</span>
+                      <span class="mag-date">15 Mar 2026</span>
+                    </div>
+                    <a href="#" class="mag-small-title"
+                      >Lancement de l'application "Ma Mairie Connectée"</a
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mag-category-block">
+          <h2 class="mag-section-title">Activité Communale & Culture</h2>
+
+          <div class="row g-4">
+            <div class="col-lg-6">
+              <a href="#" class="mag-featured-post">
+                <img
+                  src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1000&q=80"
+                  alt="Culture"
+                />
+                <div class="mag-featured-overlay">
+                  <span class="mag-badge">Festival</span>
+                  <span class="mag-date">• 02 Avril 2026</span>
+
+                  <h3 class="mag-featured-title mt-2">
+                    Festival des arts et cultures du Gbêkê : une édition
+                    historique
+                  </h3>
+                  <p class="mag-featured-excerpt">
+                    Des milliers de festivaliers se sont réunis ce week-end pour
+                    célébrer la richesse de nos traditions lors d'une cérémonie
+                    riche en couleurs...
+                  </p>
+                </div>
+              </a>
+            </div>
+
+            <div class="col-lg-6">
+              <div class="row g-4">
+                <div class="col-md-6">
+                  <div class="mag-small-post">
+                    <a href="#">
+                      <div class="mag-small-img-wrapper">
+                        <img
+                          src="https://images.unsplash.com/photo-1541625602330-2277a4c46182?auto=format&fit=crop&w=600&q=80"
+                          alt="Vélo"
+                        />
+                      </div>
+                    </a>
+                    <div class="mag-small-meta">
+                      <span class="mag-badge">Citoyenneté</span>
+                      <span class="mag-date">30 Mar 2026</span>
+                    </div>
+                    <a href="#" class="mag-small-title"
+                      >Succès de l'opération de salubrité "Bouaké Ville
+                      Propre"</a
+                    >
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="mag-small-post">
+                    <a href="#">
+                      <div class="mag-small-img-wrapper">
+                        <img
+                          src="https://images.unsplash.com/photo-1513530534585-c7b1394c6d51?auto=format&fit=crop&w=600&q=80"
+                          alt="Artisanat"
+                        />
+                      </div>
+                    </a>
+                    <div class="mag-small-meta">
+                      <span class="mag-badge">Artisanat</span>
+                      <span class="mag-date">25 Mar 2026</span>
+                    </div>
+                    <a href="#" class="mag-small-title"
+                      >La grande foire de l'artisanat local ouvre au public</a
+                    >
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="mag-small-post">
+                    <a href="#">
+                      <div class="mag-small-img-wrapper">
+                        <img
+                          src="https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&w=600&q=80"
+                          alt="Femmes"
+                        />
+                      </div>
+                    </a>
+                    <div class="mag-small-meta">
+                      <span class="mag-badge">Société</span>
+                      <span class="mag-date">18 Mar 2026</span>
+                    </div>
+                    <a href="#" class="mag-small-title"
+                      >La Mairie rend hommage aux femmes leaders de la
+                      commune</a
+                    >
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="mag-small-post">
+                    <a href="#">
+                      <div class="mag-small-img-wrapper">
+                        <img
+                          src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=600&q=80"
+                          alt="Cérémonie"
+                        />
+                      </div>
+                    </a>
+                    <div class="mag-small-meta">
+                      <span class="mag-badge">Cérémonie</span>
+                      <span class="mag-date">10 Mar 2026</span>
+                    </div>
+                    <a href="#" class="mag-small-title"
+                      >Retour en images sur les célébrations de la fête de
+                      l'indépendance</a
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <button id="btnRemonter" class="btn-remonter" title="Remonter en haut">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        fill="currentColor"
+        viewBox="0 0 16 16"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M8 12a.5.5 0 0 0 .5-.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 .5.5z"
+        />
+      </svg>
+    </button>
+
+    <footer class="bg-dark text-white py-5 text-center mt-0">
+      <p class="mb-0 text-muted">
+        &copy; 2026 Mairie de Bouaké - Tous droits réservés.
+      </p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      let boutonRemonter = document.getElementById("btnRemonter");
+
+      // Quand on scrolle de 400px, on affiche le bouton
+      window.onscroll = function () {
+        if (
+          document.body.scrollTop > 400 ||
+          document.documentElement.scrollTop > 400
+        ) {
+          boutonRemonter.classList.add("visible");
+        } else {
+          boutonRemonter.classList.remove("visible");
+        }
+      };
+
+      // Quand on clique, on remonte d'un coup !
+      boutonRemonter.addEventListener("click", function () {
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth", // Changez "smooth" par "auto" si vous voulez un saut 100% instantané sans animation
+        });
+      });
+    </script>
+  </body>
+</html>
