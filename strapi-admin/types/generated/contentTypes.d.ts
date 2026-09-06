@@ -489,8 +489,9 @@ export interface ApiActualiteActualite extends Struct.CollectionTypeSchema {
   };
   attributes: {
     auteur: Schema.Attribute.String;
-    category: Schema.Attribute.Enumeration<
-      ['urbanisme', 'economie', 'education', 'culture', 'sante']
+    categorie: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::categorie-actualite.categorie-actualite'
     >;
     content: Schema.Attribute.Blocks;
     coverImage: Schema.Attribute.Media<
@@ -536,6 +537,45 @@ export interface ApiActualiteActualite extends Struct.CollectionTypeSchema {
         number
       > &
       Schema.Attribute.DefaultTo<0>;
+  };
+}
+
+export interface ApiCategorieActualiteCategorieActualite
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'categorie_actualites';
+  info: {
+    displayName: 'Categorie (Actualite)';
+    pluralName: 'categorie-actualites';
+    singularName: 'categorie-actualite';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    actualites: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::actualite.actualite'
+    >;
+    couleur: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'#009640'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::categorie-actualite.categorie-actualite'
+    > &
+      Schema.Attribute.Private;
+    nom: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
+    publishedAt: Schema.Attribute.DateTime;
+    slug: Schema.Attribute.UID<'nom'> & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
   };
 }
 
@@ -1166,6 +1206,7 @@ declare module '@strapi/strapi' {
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
       'api::actualite.actualite': ApiActualiteActualite;
+      'api::categorie-actualite.categorie-actualite': ApiCategorieActualiteCategorieActualite;
       'api::evenement.evenement': ApiEvenementEvenement;
       'api::flash-info.flash-info': ApiFlashInfoFlashInfo;
       'api::projet.projet': ApiProjetProjet;

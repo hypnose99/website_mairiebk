@@ -2,14 +2,6 @@
 
 import { extractPlainText } from '~/utils/content'
 
-const CATEGORY_LABELS: Record<string, string> = {
-  urbanisme: 'Urbanisme & Travaux',
-  economie:  'Économie Locale',
-  sante:     'Santé',
-  education: 'Éducation',
-  culture:   'Culture & Sport',
-}
-
 /** Génère un slug stable lorsque Strapi renvoie un slug vide. */
 export function slugify(value: unknown): string {
   if (typeof value !== 'string') return ''
@@ -83,8 +75,9 @@ export function transformActualite(item: any, strapiBase: string) {
     title:         item.title,
     excerpt:       autoExcerpt(item.excerpt, content),
     content,
-    category:      item.category ?? '',
-    categoryLabel: CATEGORY_LABELS[item.category] ?? item.category ?? '',
+    category:      item.categorie?.slug ?? '',
+    categoryLabel: item.categorie?.nom ?? '',
+    categoryColor: item.categorie?.couleur ?? null,
     date_publication: item.date_publication ?? null,
     publishedAt:   item.publishedAt,
     author:        item.auteur ?? 'Service Communication',

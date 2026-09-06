@@ -6,14 +6,6 @@ useSeoMeta({
   description: 'Toutes les actualités de la Mairie de Bouaké : urbanisme, économie, éducation, culture et santé.',
 })
 
-const CATS = [
-  { value: 'urbanisme', label: 'Urbanisme & Travaux',  accent: '#E65100' },
-  { value: 'economie',  label: 'Économie Locale',       accent: '#009640' },
-  { value: 'education', label: 'Éducation & Jeunesse',  accent: '#1565C0' },
-  { value: 'culture',   label: 'Culture & Sport',        accent: '#7B1FA2' },
-  { value: 'sante',     label: 'Santé & Social',         accent: '#C62828' },
-]
-
 const PER_PAGE = 4
 
 // ── Fetch ────────────────────────────────────────────────────────────────────
@@ -21,6 +13,15 @@ const { data, pending } = useFetch<{ items: Actualite[]; total: number }>('/api/
   query: { perPage: 999 },
   key: 'actu-all',
 })
+
+// Catégories gérées dans Strapi (Content Manager → Categorie (Actualite)) :
+// aucune modification de code n'est nécessaire pour en ajouter une nouvelle.
+interface CatOption { value: string; label: string; accent: string }
+const { data: catsData } = useFetch<CatOption[]>('/api/categories-actualites', {
+  key: 'actu-categories',
+  default: () => [],
+})
+const CATS = computed(() => catsData.value ?? [])
 
 // ── Filtres ──────────────────────────────────────────────────────────────────
 const searchText  = ref('')
@@ -51,8 +52,8 @@ const globalFiltered = computed<Actualite[]>(() => {
 // ── Sections par catégorie ────────────────────────────────────────────────────
 const sections = computed(() => {
   const cats = selCategory.value
-    ? CATS.filter(c => c.value === selCategory.value)
-    : CATS
+    ? CATS.value.filter(c => c.value === selCategory.value)
+    : CATS.value
 
   return cats.map(cat => ({
     ...cat,
@@ -82,8 +83,8 @@ const getGridArticles = (cat: string, articles: Actualite[]) => {
 const fmt = (d: string) =>
   new Date(d).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
 
-const getAccent   = (cat: string) => CATS.find(c => c.value === cat)?.accent ?? '#009640'
-const getCatLabel = (cat: string) => CATS.find(c => c.value === cat)?.label ?? cat
+const getAccent   = (cat: string) => CATS.value.find(c => c.value === cat)?.accent ?? '#009640'
+const getCatLabel = (cat: string) => CATS.value.find(c => c.value === cat)?.label ?? cat
 
 const YEARS  = ['2026', '2025', '2024']
 const MONTHS = [

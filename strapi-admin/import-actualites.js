@@ -47,17 +47,22 @@ async function uploadRemoteImageToStrapi(url, fileName) {
   return data[0]?.id ?? null
 }
 
-async function importArticle(article) {
+async function importArticle(article, categoryMap) {
   const coverImageId = article.coverImage
     ? await uploadRemoteImageToStrapi(article.coverImage, `${article.slug || article.id}.jpg`)
     : null
+
+  const categorieId = categoryMap[article.category]
+  if (!categorieId) {
+    console.warn(`    ⚠️  Catégorie "${article.category}" introuvable dans categorie-actualites, article importé sans catégorie`)
+  }
 
   const data = {
     title:         article.title,
     slug:          article.slug,
     excerpt:       article.excerpt,
     content:       article.content,
-    category:      article.category,
+    ...(categorieId ? { categorie: categorieId } : {}),
     auteur:        article.author ?? 'Service Communication',
     featured:      article.featured ?? false,
     videoUrl:      article.videoUrl ?? null,
@@ -100,15 +105,26 @@ async function importArticle(article) {
   return documentId
 }
 
+async function fetchCategoryMap() {
+  const res = await fetch(`${STRAPI_BASE_URL}/api/categorie-actualites?pagination[pageSize]=100`, { headers })
+  if (!res.ok) throw new Error('Impossible de récupérer les catégories (categorie-actualites)')
+  const json = await res.json()
+  const map = {}
+  for (const cat of json.data ?? []) map[cat.slug] = cat.documentId
+  return map
+}
+
 async function main() {
   console.log(`\n🚀 Import de ${articles.length} articles vers Strapi...\n`)
+
+  const categoryMap = await fetchCategoryMap()
 
   let success = 0
   let errors  = 0
 
   for (const article of articles) {
     try {
-      await importArticle(article)
+      await importArticle(article, categoryMap)
       console.log(`  ✅  ${article.title.slice(0, 65)}`)
       success++
     } catch (err) {

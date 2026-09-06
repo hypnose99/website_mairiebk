@@ -1,0 +1,75 @@
+services:
+  # ── Strapi (API + admin) ──────────────────────────────────────────────────
+  - type: web
+    name: mairie-bouake-strapi
+    runtime: node
+    plan: starter
+    region: frankfurt
+    rootDir: strapi-admin
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: HOST
+        value: 0.0.0.0
+      # Secrets Strapi — copier les valeurs de strapi-admin/.env (ne jamais les commiter)
+      - key: APP_KEYS
+        sync: false
+      - key: API_TOKEN_SALT
+        sync: false
+      - key: ADMIN_JWT_SECRET
+        sync: false
+      - key: TRANSFER_TOKEN_SALT
+        sync: false
+      - key: ENCRYPTION_KEY
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      # Base de données Supabase (déjà distante — voir strapi-admin/.env)
+      - key: DATABASE_CLIENT
+        value: postgres
+      - key: DATABASE_HOST
+        sync: false
+      - key: DATABASE_PORT
+        sync: false
+      - key: DATABASE_NAME
+        sync: false
+      - key: DATABASE_USERNAME
+        sync: false
+      - key: DATABASE_PASSWORD
+        sync: false
+      - key: DATABASE_SSL
+        value: "true"
+      - key: DATABASE_SSL_REJECT_UNAUTHORIZED
+        value: "false"
+      # Cloudinary (médias)
+      - key: CLOUDINARY_NAME
+        sync: false
+      - key: CLOUDINARY_KEY
+        sync: false
+      - key: CLOUDINARY_SECRET
+        sync: false
+      # À compléter une fois l'URL du site Nuxt connue (voir instructions de déploiement)
+      - key: CORS_ORIGINS
+        sync: false
+
+  # ── Nuxt (site public) ────────────────────────────────────────────────────
+  - type: web
+    name: mairie-bouake-site
+    runtime: node
+    plan: starter
+    region: frankfurt
+    rootDir: nuxt-mairie
+    buildCommand: npm install && npm run build
+    startCommand: node .output/server/index.mjs
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # À définir avec l'URL publique du service mairie-bouake-strapi ci-dessus
+      - key: STRAPI_URL
+        sync: false
+      - key: STRAPI_TOKEN
+        sync: false
+      - key: SITE_URL
+        sync: false

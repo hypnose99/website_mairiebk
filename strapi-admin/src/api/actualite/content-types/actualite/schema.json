@@ -18,15 +18,11 @@
     "content": {
       "type": "blocks"
     },
-    "category": {
-      "type": "enumeration",
-      "enum": [
-        "urbanisme",
-        "economie",
-        "education",
-        "culture",
-        "sante"
-      ]
+    "categorie": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::categorie-actualite.categorie-actualite",
+      "inversedBy": "actualites"
     },
     "coverImage": {
       "type": "media",

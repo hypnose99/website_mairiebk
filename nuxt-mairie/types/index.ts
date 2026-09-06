@@ -85,15 +85,9 @@ export interface ProjectImage {
 
 // ─── Actualités ──────────────────────────────────────────────────────────────
 
-export type ActualiteCategory =
-  | 'urbanisme'
-  | 'economie'
-  | 'education'
-  | 'culture'
-  | 'sante'
-  | 'social'
-  | 'securite'
-  | 'environnement'
+// Catégories gérées dans Strapi (collection "Categorie (Actualite)") : la liste
+// n'est plus figée dans le code, donc plus de union de valeurs possibles.
+export type ActualiteCategory = string
 
 export interface Actualite {
   id: string
@@ -103,6 +97,7 @@ export interface Actualite {
   content: unknown       // Strapi Blocks ou HTML legacy
   category: ActualiteCategory
   categoryLabel: string
+  categoryColor: string | null
   date_publication?: string | null
   publishedAt: string    // ISO 8601
   author: string

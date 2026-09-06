@@ -48,15 +48,8 @@ const readingTime = computed(() => {
   return Math.max(1, Math.ceil(words / 200));
 })
 
-// Couleur par catégorie
-const categoryColors: Record<string, string> = {
-  urbanisme: '#1a6b3c',
-  economie:  '#1a4f8a',
-  sante:     '#b03a2e',
-  education: '#6c3483',
-  culture:   '#d35400',
-}
-const catColor = computed(() => categoryColors[article.value?.category ?? ''] ?? 'var(--primary-green)')
+// Couleur par catégorie (gérée dans Strapi → Categorie (Actualite))
+const catColor = computed(() => article.value?.categoryColor ?? 'var(--primary-green)')
 
 // YouTube embed
 const youtubeId = computed(() => {
@@ -246,9 +239,11 @@ useSeoMeta({
         <!-- Contenu -->
         <div class="article-content-box">
           <div class="article-accent-bar" :style="{ background: catColor }" />
-          <!-- eslint-disable-next-line vue/no-v-html -->
           <div class="article-content">
-            <StrapiBlocksText :nodes="article.content" />
+            <StrapiBlocksText v-if="Array.isArray(article.content) && article.content.length" :nodes="article.content" />
+            <!-- eslint-disable-next-line vue/no-v-html -->
+            <div v-else-if="typeof article.content === 'string' && article.content" v-html="article.content" />
+            <p v-else>{{ article.excerpt }}</p>
           </div>
         </div>
 
@@ -408,7 +403,7 @@ useSeoMeta({
             >
               <img :src="art.coverImage" :alt="art.title" class="featured-row-img" />
               <div>
-                <span class="featured-cat-badge" :style="{ background: categoryColors[art.category] ?? 'var(--primary-green)' }">
+                <span class="featured-cat-badge" :style="{ background: art.categoryColor ?? 'var(--primary-green)' }">
                   {{ art.categoryLabel }}
                 </span>
                 <p class="featured-row-title">{{ art.title }}</p>

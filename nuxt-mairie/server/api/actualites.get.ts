@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
   const params = new URLSearchParams()
 
   if (query.category) {
-    params.append('filters[category][$eq]', query.category as string)
+    params.append('filters[categorie][slug][$eq]', query.category as string)
   }
   if (query.search) {
     params.append('filters[$or][0][title][$containsi]', query.search as string)

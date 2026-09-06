@@ -7,6 +7,16 @@
 const { createCoreController } = require('@strapi/strapi').factories;
 
 module.exports = createCoreController('api::actualite.actualite', ({ strapi }) => ({
+	// `views` et `likes` ne doivent être modifiés que via incrementView/incrementLike/decrementLike
+	// ci-dessous (delta de ±1), jamais via une édition directe (Content Manager, API, script...).
+	async update(ctx) {
+		if (ctx.request.body?.data) {
+			delete ctx.request.body.data.views;
+			delete ctx.request.body.data.likes;
+		}
+		return super.update(ctx);
+	},
+
 	async findByIdentifier(identifier) {
 		const documents = strapi.documents('api::actualite.actualite');
 		const byDocumentId = await documents.findOne({ documentId: identifier });
