@@ -12,6 +12,12 @@ module.exports = ({ env }) => ({
         uploadStream: {},
         delete: {},
       },
+      // Désactivé temporairement (Windows) : la génération de plusieurs formats
+      // en parallèle multiplie les fichiers temporaires, ce qui augmente le
+      // risque de collision avec l'antivirus lors du nettoyage du dossier temp
+      // (erreur ENOTEMPTY: directory not empty, rmdir 'strapi-upload-...').
+      sizeOptimization: false,
+      responsiveDimensions: false,
     },
   },
 });

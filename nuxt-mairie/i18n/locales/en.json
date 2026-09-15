@@ -1,0 +1,42 @@
+{
+  "nav": {
+    "accueil": "Home",
+    "elus": "Municipality",
+    "services": "Services",
+    "projets": "Projects",
+    "actualites": "News",
+    "opportunites": "Opportunities",
+    "ariaLabel": "Main navigation",
+    "mobileAriaLabel": "Mobile navigation",
+    "open": "Open menu",
+    "close": "Close menu"
+  },
+  "header": {
+    "logoAlt": "Coat of arms of the City of Bouaké"
+  },
+  "footer": {
+    "description": "Official website of the City of Bouaké, capital of the Gbêkê region, Côte d'Ivoire.",
+    "quickLinks": "Quick links",
+    "contact": "Contact",
+    "rights": "City of Bouaké — All rights reserved."
+  },
+  "home": {
+    "upcomingEvents": "Upcoming events",
+    "flashInfo": "News flash",
+    "cityTitle": "Bouaké in figures",
+    "latestNews": "Latest news",
+    "quickServices": "Quick access"
+  },
+  "common": {
+    "seeAll": "See all",
+    "loading": "Loading...",
+    "error": "Something went wrong.",
+    "backToHome": "Back to home",
+    "learnMore": "Learn more"
+  },
+  "pwa": {
+    "updateAvailable": "An update is available. Click to refresh.",
+    "offlineReady": "The site is available offline.",
+    "install": "Install the app"
+  }
+}

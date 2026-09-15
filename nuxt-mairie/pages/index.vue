@@ -155,6 +155,51 @@ const investCards = [
   { num: '07', title: 'Mobilité & Transport', text: 'Réseau de bus, taxis communaux et projets de voirie.' },
   { num: '08', title: 'Solidarité & Social', text: 'Aides aux familles, soutien aux associations et inclusion.' },
 ]
+// ── Roue « C » du hero ─────────────────────────────────────────────────────
+// Chaque segment de l'anneau renvoie vers une grande rubrique du site.
+const heroWheel = [
+  {
+    id: 'quefaire',
+    label: 'Que faire à Bouaké ?',
+    to: '/services',
+    d: 'M 546.6 428.4 A 278 278 0 0 1 317.0 577.5 L 308.5 439.7 A 140 140 0 0 0 424.2 364.6 Z',
+    image: 'https://images.unsplash.com/photo-1580519542036-c47de6196ba5?auto=format&fit=crop&w=700&q=80',
+  },
+  {
+    id: 'investir',
+    label: 'Investir à Bouaké',
+    to: '/opportunites',
+    d: 'M 304.9 578.0 A 278 278 0 0 1 64.2 447.3 L 181.3 374.2 A 140 140 0 0 0 302.4 440.0 Z',
+    image: 'https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=700&q=80',
+  },
+  {
+    id: 'mairie',
+    label: 'La Mairie',
+    to: '/elus',
+    d: 'M 58.0 436.9 A 278 278 0 0 1 58.0 163.1 L 178.2 231.1 A 140 140 0 0 0 178.2 368.9 Z',
+    image: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=700&q=80',
+  },
+  {
+    id: 'projets',
+    label: 'Projet Bouaké Nouveau',
+    to: '/projets',
+    d: 'M 64.2 152.7 A 278 278 0 0 1 304.9 22.0 L 302.4 160.0 A 140 140 0 0 0 181.3 225.8 Z',
+    image: 'https://images.unsplash.com/photo-1522778119026-d647f0565c6a?auto=format&fit=crop&w=700&q=80',
+  },
+  {
+    id: 'citoyenne',
+    label: 'Bouaké, ville citoyenne',
+    to: '/actualites',
+    d: 'M 317.0 22.5 A 278 278 0 0 1 546.6 171.6 L 424.2 235.4 A 140 140 0 0 0 308.5 160.3 Z',
+    image: 'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=700&q=80',
+  },
+]
+
+const heroHovered = ref<string | null>(null)
+const heroCaption = computed(() =>
+  heroWheel.find(s => s.id === heroHovered.value)?.label
+    ?? 'Blason de la Mairie · Symbole de l\'unité communale'
+)
 </script>
 
 <template>
@@ -184,13 +229,54 @@ const investCards = [
             </div>
           </div>
 
-          <div class="s-hero__emblem" aria-hidden="true">
-            <img
-              src="/images/tabouretakan.png"
-              alt="Tabouret akan, symbole du pouvoir traditionnel"
-              class="s-hero__tabouret"
-            />
-            <p class="s-hero__plaque-caption">Tabouret akan · Symbole du pouvoir et de l'unité</p>
+          <div class="s-hero__emblem">
+            <div class="hero-wheel">
+              <svg class="hero-wheel__svg" viewBox="0 0 600 600" role="navigation" aria-label="Accès rapides">
+                <defs>
+                  <pattern
+                    v-for="seg in heroWheel"
+                    :id="`wheelImg-${seg.id}`"
+                    :key="seg.id"
+                    patternUnits="userSpaceOnUse"
+                    width="600"
+                    height="600"
+                  >
+                    <image :href="seg.image" width="600" height="600" preserveAspectRatio="xMidYMid slice" />
+                  </pattern>
+                </defs>
+
+                <g
+                  v-for="seg in heroWheel"
+                  :key="seg.id"
+                  class="hero-wheel__seg"
+                  role="link"
+                  tabindex="0"
+                  :aria-label="seg.label"
+                  @mouseenter="heroHovered = seg.id"
+                  @mouseleave="heroHovered = null"
+                  @focus="heroHovered = seg.id"
+                  @blur="heroHovered = null"
+                  @click="navigateTo(seg.to)"
+                  @keydown.enter="navigateTo(seg.to)"
+                >
+                  <title>{{ seg.label }}</title>
+                  <path class="hero-wheel__img" :d="seg.d" :fill="`url(#wheelImg-${seg.id})`" />
+                  <path class="hero-wheel__tint" :d="seg.d" />
+                </g>
+              </svg>
+
+              <img
+                class="hero-wheel__blason"
+                src="/images/logo.png"
+                alt="Blason de la Mairie de Bouaké"
+              >
+            </div>
+
+            <p class="s-hero__plaque-caption" :class="{ 'is-active': heroHovered }">
+              <Transition name="cap-fade">
+                <span :key="heroCaption" class="s-hero__plaque-caption-text">{{ heroCaption }}</span>
+              </Transition>
+            </p>
           </div>
 
         </div>
@@ -499,7 +585,7 @@ const investCards = [
 }
 .s-hero__grid {
   display: grid;
-  grid-template-columns: 1.25fr 0.75fr;
+  grid-template-columns: 1.1fr 0.9fr;
   gap: 48px;
   align-items: center;
 }
@@ -564,42 +650,101 @@ const investCards = [
 }
 .btn-outline-ink:hover { background: #12140F; color: white; }
 
-/* Plaque armoiries */
+/* Roue « C » du hero (anneau ouvert + blason au centre) */
 .s-hero__emblem {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 }
-.s-hero__tabouret {
-  display: block;
-  width: min(400px, 100%);
-  height: auto;
-  filter: drop-shadow(0 22px 34px rgba(30, 20, 10, 0.26));
+.hero-wheel {
+  position: relative;
+  width: min(560px, 100%);
+  aspect-ratio: 1;
+}
+.hero-wheel__svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 18px 30px rgba(30, 20, 10, 0.18));
+}
+.hero-wheel__seg {
+  cursor: pointer;
+  transform-origin: 300px 300px;
   will-change: transform;
-  /* Pivotement 3D doux et continu */
-  animation: tabouretSway 9s ease-in-out infinite;
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
-@keyframes tabouretSway {
-  0%   { transform: perspective(900px) rotateY(-14deg) translateY(0); }
-  25%  { transform: perspective(900px) rotateY(0deg)   translateY(-8px); }
-  50%  { transform: perspective(900px) rotateY(14deg)  translateY(0); }
-  75%  { transform: perspective(900px) rotateY(0deg)   translateY(-8px); }
-  100% { transform: perspective(900px) rotateY(-14deg) translateY(0); }
+.hero-wheel__seg:hover,
+.hero-wheel__seg:focus-visible {
+  transform: scale(1.03);
+  outline: none;
 }
-/* Respect des préférences d'accessibilité */
+.hero-wheel__img { stroke: none; }
+.hero-wheel__tint {
+  fill: var(--orange);
+  mix-blend-mode: hard-light;
+  opacity: 0.42;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+.hero-wheel__seg:hover .hero-wheel__tint,
+.hero-wheel__seg:focus-visible .hero-wheel__tint { opacity: 0; }
+
+/* Le blason occupe le trou central de l'anneau (r = 140 / 300) */
+.hero-wheel__blason {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 33%;
+  width: auto;
+  max-width: 27%;
+  object-fit: contain;
+  pointer-events: none;
+  filter: drop-shadow(0 10px 18px rgba(30, 20, 10, 0.18));
+  animation: blasonFloat 9s ease-in-out infinite;
+}
+@keyframes blasonFloat {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50%      { transform: translate(-50%, -52%) scale(1.03); }
+}
 @media (prefers-reduced-motion: reduce) {
-  .s-hero__tabouret { animation: none; }
+  .hero-wheel__blason { animation: none; }
+  .hero-wheel__seg { transition: none; }
 }
+
 .s-hero__plaque-caption {
+  /* Hauteur et taille de police figées : le texte change au survol sans
+     jamais déplacer le reste de la page. */
+  position: relative;
+  width: 100%;
+  height: 16px;
   margin: 22px 0 0;
-  font-size: 0.6rem;
+  font-size: 0.62rem;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.16em;
   color: #8E8D82;
   text-align: center;
+  transition: color 0.3s ease;
 }
+.s-hero__plaque-caption.is-active { color: var(--orange); }
+.s-hero__plaque-caption-text {
+  position: absolute;
+  inset: 0;
+  display: block;
+  line-height: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* Fondu doux d'un libellé à l'autre */
+.cap-fade-enter-active,
+.cap-fade-leave-active { transition: opacity 0.22s ease; }
+.cap-fade-enter-from,
+.cap-fade-leave-to { opacity: 0; }
 
 /* ── QUICK NAV ───────────────────────────────────────────────────── */
 .s-quicknav {
@@ -972,7 +1117,7 @@ const investCards = [
 @media (max-width: 992px) {
   .s-hero__grid { grid-template-columns: 1fr; gap: 36px; }
   .s-hero__emblem { justify-content: flex-start; }
-  .s-hero__tabouret { width: 280px; }
+  .hero-wheel { width: min(420px, 100%); }
 }
 @media (max-width: 768px) {
   .container-wide { padding: 0 20px; }

@@ -15,7 +15,7 @@ export default defineNuxtConfig({
   i18n: {
     locales: [
       { code: 'fr',     language: 'fr-CI',  name: 'Français', file: 'fr.json',     dir: 'ltr' },
-      { code: 'dioula', language: 'dyu-CI', name: 'Dioula',   file: 'dioula.json', dir: 'ltr' },
+      { code: 'en',     language: 'en-US', name: 'English',  file: 'en.json',     dir: 'ltr' },
     ],
     defaultLocale: 'fr',
     lazy: true,

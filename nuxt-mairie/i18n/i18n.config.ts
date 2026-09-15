@@ -8,7 +8,7 @@ export default defineI18nConfig(() => ({
   missingWarn: false,      // Silencieux en prod si clé manquante
   fallbackWarn: false,
 
-  // Formats de dates et nombres pour la Côte d'Ivoire
+  // Formats de dates et nombres (FR = Côte d'Ivoire, EN = international)
   datetimeFormats: {
     fr: {
       short: { year: 'numeric', month: 'short', day: 'numeric' },
@@ -18,9 +18,13 @@ export default defineI18nConfig(() => ({
       },
       monthYear: { year: 'numeric', month: 'long' },
     },
-    dioula: {
+    en: {
       short: { year: 'numeric', month: 'short', day: 'numeric' },
-      long: { year: 'numeric', month: 'long', day: 'numeric' },
+      long: {
+        year: 'numeric', month: 'long', day: 'numeric',
+        weekday: 'long', hour: 'numeric', minute: 'numeric',
+      },
+      monthYear: { year: 'numeric', month: 'long' },
     },
   },
 
@@ -35,12 +39,15 @@ export default defineI18nConfig(() => ({
       decimal: { style: 'decimal', minimumFractionDigits: 0 },
       percent: { style: 'percent', useGrouping: false },
     },
-    dioula: {
+    en: {
       currency: {
         style: 'currency',
         currency: 'XOF',
+        currencyDisplay: 'symbol',
         minimumFractionDigits: 0,
       },
+      decimal: { style: 'decimal', minimumFractionDigits: 0 },
+      percent: { style: 'percent', useGrouping: false },
     },
   },
 }))
