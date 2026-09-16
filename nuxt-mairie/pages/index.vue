@@ -160,45 +160,60 @@ const investCards = [
 ]
 // ── Roue « C » du hero ─────────────────────────────────────────────────────
 // Chaque segment de l'anneau renvoie vers une grande rubrique du site.
+// Les photos sont servies depuis public/images/img-c/ (le chemin est sensible à la casse).
+// `box` = cadre du segment dans le viewBox 600×600 : la photo y est ajustée pour que
+// le sujet reste visible. `alt` décrit la photo (infobulle + ligne sous la roue) ;
+// `author` est facultatif et s'affiche s'il est renseigné.
 const heroWheel = [
   {
     id: 'quefaire',
     label: 'Que faire à Bouaké ?',
     to: '/services',
     d: 'M 546.6 428.4 A 278 278 0 0 1 317.0 577.5 L 308.5 439.7 A 140 140 0 0 0 424.2 364.6 Z',
-    image: 'https://images.unsplash.com/photo-1580519542036-c47de6196ba5?auto=format&fit=crop&w=700&q=80',
+    image: '/images/img-c/que-faire.jpg',
+    box: { x: 309, y: 365, w: 238, h: 213 },
+    photo: { alt: 'Détente au bord de la piscine à Bouaké', author: '' },
   },
   {
     id: 'investir',
     label: 'Investir à Bouaké',
     to: '/opportunites',
     d: 'M 304.9 578.0 A 278 278 0 0 1 64.2 447.3 L 181.3 374.2 A 140 140 0 0 0 302.4 440.0 Z',
-    image: 'https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=700&q=80',
+    image: '/images/img-c/Marche-de-gros-de-Bouake.webp',
+    box: { x: 64, y: 374, w: 241, h: 204 },
+    photo: { alt: 'Marché de gros de Bouaké', author: '' },
   },
   {
     id: 'mairie',
     label: 'La Mairie',
     to: '/elus',
     d: 'M 58.0 436.9 A 278 278 0 0 1 58.0 163.1 L 178.2 231.1 A 140 140 0 0 0 178.2 368.9 Z',
-    image: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=700&q=80',
+    image: '/images/img-c/hotel-de-ville.jpg',
+    box: { x: 22, y: 163, w: 156, h: 274 },
+    photo: { alt: 'Hôtel de ville de Bouaké', author: '' },
   },
   {
     id: 'projets',
     label: 'Projet Bouaké Nouveau',
     to: '/projets',
     d: 'M 64.2 152.7 A 278 278 0 0 1 304.9 22.0 L 302.4 160.0 A 140 140 0 0 0 181.3 225.8 Z',
-    image: 'https://images.unsplash.com/photo-1522778119026-d647f0565c6a?auto=format&fit=crop&w=700&q=80',
+    image: '/images/img-c/projet-bouake.jpg',
+    box: { x: 64, y: 22, w: 241, h: 204 },
+    photo: { alt: 'Pose de la première pierre du Grand Marché de Bouaké', author: '' },
   },
   {
     id: 'citoyenne',
     label: 'Bouaké, ville citoyenne',
     to: '/actualites',
     d: 'M 317.0 22.5 A 278 278 0 0 1 546.6 171.6 L 424.2 235.4 A 140 140 0 0 0 308.5 160.3 Z',
-    image: 'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=700&q=80',
+    image: '/images/img-c/stade-de-la-paix.jpg',
+    box: { x: 309, y: 23, w: 238, h: 213 },
+    photo: { alt: 'Stade de la Paix de Bouaké', author: '' },
   },
 ]
 
 const heroHovered = ref<string | null>(null)
+const heroCredit = computed(() => heroWheel.find(s => s.id === heroHovered.value)?.photo ?? null)
 const heroCaption = computed(() =>
   heroWheel.find(s => s.id === heroHovered.value)?.label
     ?? 'Blason de la Mairie · Symbole de l\'unité communale'
@@ -236,15 +251,24 @@ const heroCaption = computed(() =>
             <div class="hero-wheel">
               <svg class="hero-wheel__svg" viewBox="0 0 600 600" role="navigation" aria-label="Accès rapides">
                 <defs>
+                  <!-- Chaque photo est cadrée sur son propre segment (et non sur tout
+                       le cercle) pour que le sujet reste visible. -->
                   <pattern
                     v-for="seg in heroWheel"
                     :id="`wheelImg-${seg.id}`"
                     :key="seg.id"
                     patternUnits="userSpaceOnUse"
-                    width="600"
-                    height="600"
+                    :x="seg.box.x"
+                    :y="seg.box.y"
+                    :width="seg.box.w"
+                    :height="seg.box.h"
                   >
-                    <image :href="seg.image" width="600" height="600" preserveAspectRatio="xMidYMid slice" />
+                    <image
+                      :href="seg.image"
+                      :width="seg.box.w"
+                      :height="seg.box.h"
+                      preserveAspectRatio="xMidYMid slice"
+                    />
                   </pattern>
                 </defs>
 
@@ -262,7 +286,7 @@ const heroCaption = computed(() =>
                   @click="navigateTo(seg.to)"
                   @keydown.enter="navigateTo(seg.to)"
                 >
-                  <title>{{ seg.label }}</title>
+                  <title>{{ seg.label }} — {{ seg.photo.alt }}{{ seg.photo.author ? ` (photo : ${seg.photo.author})` : '' }}</title>
                   <path class="hero-wheel__img" :d="seg.d" :fill="`url(#wheelImg-${seg.id})`" />
                   <path class="hero-wheel__tint" :d="seg.d" />
                 </g>
@@ -280,6 +304,11 @@ const heroCaption = computed(() =>
                 <span :key="heroCaption" class="s-hero__plaque-caption-text">{{ heroCaption }}</span>
               </Transition>
             </p>
+            <p class="s-hero__credits">
+              <template v-if="heroCredit">
+                {{ heroCredit.alt }}<template v-if="heroCredit.author"> · Photo {{ heroCredit.author }}</template>
+              </template>
+            </p>
           </div>
 
         </div>
@@ -291,14 +320,6 @@ const heroCaption = computed(() =>
     ══════════════════════════════════════════════════════ -->
     <nav class="s-quicknav">
       <div class="s-quicknav__inner">
-        <NuxtLink to="/services" class="qnav-item">
-          <i class="bi bi-people-fill qnav-icon" />
-          <span>Services aux citoyens</span>
-        </NuxtLink>
-        <NuxtLink to="/projets" class="qnav-item">
-          <i class="bi bi-kanban-fill qnav-icon" />
-          <span>Actions et projets</span>
-        </NuxtLink>
         <NuxtLink to="#" class="qnav-item">
           <i class="bi bi-building-fill qnav-icon" />
           <span>Assemblée citoyenne</span>
@@ -306,10 +327,6 @@ const heroCaption = computed(() =>
         <NuxtLink to="#" class="qnav-item">
           <i class="bi bi-globe qnav-icon" />
           <span>Coopération décentralisée</span>
-        </NuxtLink>
-        <NuxtLink to="#" class="qnav-item">
-          <i class="bi bi-briefcase-fill qnav-icon" />
-          <span>Offres d'emploi</span>
         </NuxtLink>
         <NuxtLink to="#" class="qnav-item">
           <i class="bi bi-heart-fill qnav-icon" />
@@ -584,7 +601,8 @@ const heroCaption = computed(() =>
   position: relative;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 56px 48px 36px;
+  /* Marge basse réduite : la barre d'onglets orange remonte sous la roue */
+  padding: 56px 48px 12px;
 }
 .s-hero__grid {
   display: grid;
@@ -718,6 +736,19 @@ const heroCaption = computed(() =>
   .hero-wheel__seg { transition: none; }
 }
 
+/* Légende de la photo survolée dans la roue */
+.s-hero__credits {
+  margin: 4px 0 0;
+  /* Hauteur réservée pour 2 lignes : le crédit change au survol sans décaler la page */
+  min-height: 2.8em;
+  line-height: 1.4;
+  font-size: 0.68rem;
+  color: #8a8a8a;
+  text-align: center;
+}
+.s-hero__credits a { color: inherit; text-decoration: underline; }
+.s-hero__credits a:hover { color: var(--orange); }
+
 .s-hero__plaque-caption {
   /* Hauteur et taille de police figées : le texte change au survol sans
      jamais déplacer le reste de la page. */
@@ -759,7 +790,12 @@ const heroCaption = computed(() =>
 .s-quicknav::-webkit-scrollbar { display: none; }
 .s-quicknav__inner {
   display: flex;
-  max-width: 1400px;
+  /* Onglets centrés : la barre prend la largeur de son contenu et se centre.
+     Sur petit écran, si le contenu dépasse, margin:auto retombe à 0 et la barre
+     reste défilable horizontalement sans couper le premier onglet
+     (ce que ferait justify-content:center). */
+  width: fit-content;
+  max-width: none;
   margin: 0 auto;
   padding: 0 48px;
 }
@@ -1124,7 +1160,7 @@ const heroCaption = computed(() =>
 }
 @media (max-width: 768px) {
   .container-wide { padding: 0 20px; }
-  .s-hero__inner { padding: 48px 20px 32px; }
+  .s-hero__inner { padding: 48px 20px 12px; }
   .s-hero__title { font-size: 3rem; }
   .s-quicknav__inner { padding: 0 20px; }
   .proj-layout { grid-template-columns: 1fr; }
