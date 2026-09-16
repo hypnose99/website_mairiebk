@@ -10,7 +10,10 @@ const { d } = useI18n()
 const getArticleDate = (article: any) => article.date_publication || article.publishedAt
 
 const { data: actualitesData, pending: actualitesPending } = useLazyFetch('/api/actualites', {
-  query: { perPage: 8 },
+  // Le carrousel de la section Actualités défile par 4 : on charge largement de
+  // quoi alimenter le défilement (l'API renvoie déjà les articles triés du plus
+  // récent au plus ancien et n'en renvoie que ce qui existe).
+  query: { perPage: 200, fields: 'list' },
   key: 'home-actualites',
 })
 

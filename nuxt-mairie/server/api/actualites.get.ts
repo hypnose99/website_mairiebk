@@ -46,7 +46,16 @@ export default defineEventHandler(async (event) => {
       sortedItems = sortedItems.filter((a: any) => a.featured)
     }
     const start = (page - 1) * perPage
-    const paginatedItems = sortedItems.slice(start, start + perPage)
+    let paginatedItems = sortedItems.slice(start, start + perPage)
+
+    // Mode "liste" (?fields=list) : on ne renvoie que ce qu'une carte affiche.
+    // Le corps de l'article et la galerie pèsent l'essentiel de la réponse ;
+    // les écrans qui listent des articles n'en ont aucun usage, et les charger
+    // pour 200 articles alourdit la page pour rien. Le détail d'un article
+    // passe par /api/actualites/[slug], qui renvoie toujours tout.
+    if (query.fields === 'list') {
+      paginatedItems = paginatedItems.map(({ content, gallery, ...card }: any) => card)
+    }
 
     return {
       items:   paginatedItems,

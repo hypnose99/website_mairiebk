@@ -10,7 +10,7 @@ const PER_PAGE = 4
 
 // ── Fetch ────────────────────────────────────────────────────────────────────
 const { data, pending } = useFetch<{ items: Actualite[]; total: number }>('/api/actualites', {
-  query: { perPage: 999 },
+  query: { perPage: 999, fields: 'list' },
   key: 'actu-all',
 })
 
@@ -50,15 +50,28 @@ const globalFiltered = computed<Actualite[]>(() => {
 })
 
 // ── Sections par catégorie ────────────────────────────────────────────────────
+// Les articles de chaque rubrique sont triés du plus récent au plus ancien, et
+// les rubriques elles-mêmes sont classées par la date de leur article le plus
+// récent : la catégorie qui vient d'être alimentée remonte en haut de page.
+const timeOf = (article: Actualite) => {
+  const t = new Date(getArticleDate(article)).getTime()
+  return Number.isNaN(t) ? 0 : t
+}
+
 const sections = computed(() => {
   const cats = selCategory.value
     ? CATS.value.filter(c => c.value === selCategory.value)
     : CATS.value
 
-  return cats.map(cat => ({
-    ...cat,
-    articles: globalFiltered.value.filter(a => a.category === cat.value),
-  })).filter(s => s.articles.length > 0)
+  return cats
+    .map(cat => ({
+      ...cat,
+      articles: globalFiltered.value
+        .filter(a => a.category === cat.value)
+        .sort((a, b) => timeOf(b) - timeOf(a)),
+    }))
+    .filter(s => s.articles.length > 0)
+    .sort((a, b) => timeOf(b.articles[0]) - timeOf(a.articles[0]))
 })
 
 // ── Carrousel par catégorie (défilement 1 par 1) ─────────────────────────────

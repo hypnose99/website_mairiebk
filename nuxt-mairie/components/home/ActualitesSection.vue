@@ -21,8 +21,24 @@ const slides = computed(() => {
 })
 
 const slideIndex = ref(0)
-const prev = () => { slideIndex.value = Math.max(0, slideIndex.value - 1) }
-const next = () => { slideIndex.value = Math.min(slides.value.length - 1, slideIndex.value + 1) }
+
+// Le nombre d'articles peut être important : le défilement boucle pour ne
+// jamais buter sur une flèche désactivée, et un compteur situe la position.
+const slideCount = computed(() => slides.value.length)
+
+// Si la liste rétrécit (filtre, rechargement), on ne reste pas sur une page vide.
+watch(slideCount, n => {
+  if (slideIndex.value > n - 1) slideIndex.value = Math.max(0, n - 1)
+})
+
+const prev = () => {
+  if (slideCount.value < 2) return
+  slideIndex.value = (slideIndex.value - 1 + slideCount.value) % slideCount.value
+}
+const next = () => {
+  if (slideCount.value < 2) return
+  slideIndex.value = (slideIndex.value + 1) % slideCount.value
+}
 </script>
 
 <template>
@@ -57,9 +73,10 @@ const next = () => { slideIndex.value = Math.min(slides.value.length - 1, slideI
         </div>
       </Transition>
 
-      <div class="news-controls">
-        <button class="news-ctrl" :disabled="slideIndex === 0" @click="prev">‹ Précédent</button>
-        <button class="news-ctrl" :disabled="slideIndex === slides.length - 1" @click="next">Suivant ›</button>
+      <div v-if="slideCount > 1" class="news-controls">
+        <button class="news-ctrl" @click="prev">‹ Précédent</button>
+        <button class="news-ctrl" @click="next">Suivant ›</button>
+        <span class="news-count">{{ slideIndex + 1 }} / {{ slideCount }}</span>
       </div>
     </div>
   </section>
@@ -87,7 +104,8 @@ const next = () => { slideIndex.value = Math.min(slides.value.length - 1, slideI
 .n-title { font-size: 0.95rem; font-weight: 700; color: #0D0D0D; line-height: 1.4; margin: 0; flex: 1; }
 .n-more { font-size: 0.75rem; font-weight: 700; color: #E65100; text-transform: uppercase; letter-spacing: 0.06em; margin-top: auto; }
 
-.news-controls { display: flex; gap: 8px; margin-top: 24px; }
+.news-controls { display: flex; align-items: center; gap: 8px; margin-top: 24px; }
+.news-count { margin-left: 8px; font-size: 0.75rem; font-weight: 700; color: #999; letter-spacing: 0.08em; font-variant-numeric: tabular-nums; }
 .news-ctrl {
   background: none; border: 1px solid #EBEBEB; padding: 10px 20px;
   font-size: 0.8rem; font-weight: 700; color: #555; cursor: pointer;
