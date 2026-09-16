@@ -162,8 +162,8 @@ const investCards = [
 // Chaque segment de l'anneau renvoie vers une grande rubrique du site.
 // Les photos sont servies depuis public/images/img-c/ (le chemin est sensible à la casse).
 // `box` = cadre du segment dans le viewBox 600×600 : la photo y est ajustée pour que
-// le sujet reste visible. `alt` décrit la photo (infobulle + ligne sous la roue) ;
-// `author` est facultatif et s'affiche s'il est renseigné.
+// le sujet reste visible. `alt` décrit la photo (infobulle au survol) ;
+// `author` est facultatif et s'ajoute à l'infobulle s'il est renseigné.
 const heroWheel = [
   {
     id: 'quefaire',
@@ -213,7 +213,6 @@ const heroWheel = [
 ]
 
 const heroHovered = ref<string | null>(null)
-const heroCredit = computed(() => heroWheel.find(s => s.id === heroHovered.value)?.photo ?? null)
 const heroCaption = computed(() =>
   heroWheel.find(s => s.id === heroHovered.value)?.label
     ?? 'Blason de la Mairie · Symbole de l\'unité communale'
@@ -303,11 +302,6 @@ const heroCaption = computed(() =>
               <Transition name="cap-fade">
                 <span :key="heroCaption" class="s-hero__plaque-caption-text">{{ heroCaption }}</span>
               </Transition>
-            </p>
-            <p class="s-hero__credits">
-              <template v-if="heroCredit">
-                {{ heroCredit.alt }}<template v-if="heroCredit.author"> · Photo {{ heroCredit.author }}</template>
-              </template>
             </p>
           </div>
 
@@ -509,6 +503,11 @@ const heroCaption = computed(() =>
 
 /* ── Tokens ──────────────────────────────────────────────────────── */
 .page-home {
+  /* Aucun élément (animations d'entrée, roue au survol…) ne doit créer de
+     défilement horizontal, en particulier sur mobile. `clip` ne crée pas de
+     conteneur de défilement ; `hidden` sert de repli aux anciens navigateurs. */
+  overflow-x: hidden;
+  overflow-x: clip;
   --green: #009640;
   --orange: #E65100;
   --black: #0D0D0D;
@@ -601,8 +600,9 @@ const heroCaption = computed(() =>
   position: relative;
   max-width: 1400px;
   margin: 0 auto;
-  /* Marge basse réduite : la barre d'onglets orange remonte sous la roue */
-  padding: 56px 48px 12px;
+  /* Marge haute réduite : le contenu du hero remonte vers le menu.
+     Marge basse : respiration entre la légende du C et la barre d'onglets orange. */
+  padding: 16px 48px 32px;
 }
 .s-hero__grid {
   display: grid;
@@ -677,6 +677,10 @@ const heroCaption = computed(() =>
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  /* Compense la légende placée sous la roue (16px de haut + 22px de marge) :
+     ainsi c'est le centre de la roue, et non celui du bloc roue + légende,
+     qui s'aligne sur le centre du texte. */
+  padding-top: 38px;
 }
 .hero-wheel {
   position: relative;
@@ -735,19 +739,6 @@ const heroCaption = computed(() =>
   .hero-wheel__blason { animation: none; }
   .hero-wheel__seg { transition: none; }
 }
-
-/* Légende de la photo survolée dans la roue */
-.s-hero__credits {
-  margin: 4px 0 0;
-  /* Hauteur réservée pour 2 lignes : le crédit change au survol sans décaler la page */
-  min-height: 2.8em;
-  line-height: 1.4;
-  font-size: 0.68rem;
-  color: #8a8a8a;
-  text-align: center;
-}
-.s-hero__credits a { color: inherit; text-decoration: underline; }
-.s-hero__credits a:hover { color: var(--orange); }
 
 .s-hero__plaque-caption {
   /* Hauteur et taille de police figées : le texte change au survol sans
@@ -1082,7 +1073,7 @@ const heroCaption = computed(() =>
 .s-invest .section-overline { color: rgba(255,255,255,0.7); }
 .s-invest .section-title { color: white; }
 .s-invest .s-section-head { margin-bottom: 56px; }
-.invest-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: rgba(255,255,255,0.15); }
+.invest-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: rgba(255,255,255,0.15); }
 .inv-card {
   background: rgba(0, 80, 33, 0.5);
   padding: 36px 28px;
@@ -1144,30 +1135,39 @@ const heroCaption = computed(() =>
 /* ── Responsive ──────────────────────────────────────────────────── */
 @media (max-width: 1100px) {
   .s-main__inner { grid-template-columns: 1fr; }
+  /* Colonnes empilées : entrée verticale, un glissement latéral de 30px
+     débordait de l'écran au chargement et décalait la page sur mobile. */
+  .col-side, .col-form { animation-name: fadeUp; }
+  /* Une seule colonne : marges internes symétriques pour le bloc de droite */
+  .col-form { padding-left: 0; }
+  .col-form :deep(.reg-form-wrap) { padding: 32px 28px; }
   .col-side { border-right: none; border-bottom: 1px solid var(--gray-200); }
   .col-form { border-left: none; border-top: 1px solid var(--gray-200); }
   .chart-wrap { width: min(220px, 90%); }
   .news-grid { grid-template-columns: repeat(2, 1fr); }
-  .invest-grid { grid-template-columns: repeat(2, 1fr); }
+  .invest-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .place-grid { grid-template-columns: repeat(2, 1fr); }
   .s-mayor__inner { grid-template-columns: 1fr; }
   .mayor-photo { height: 300px; }
 }
 @media (max-width: 992px) {
   .s-hero__grid { grid-template-columns: 1fr; gap: 36px; }
+  .s-hero__emblem { padding-top: 0; }
   .s-hero__emblem { justify-content: flex-start; }
   .hero-wheel { width: min(420px, 100%); }
 }
 @media (max-width: 768px) {
   .container-wide { padding: 0 20px; }
-  .s-hero__inner { padding: 48px 20px 12px; }
+  .s-hero__inner { padding: 28px 20px 28px; }
   .s-hero__title { font-size: 3rem; }
   .s-quicknav__inner { padding: 0 20px; }
   .proj-layout { grid-template-columns: 1fr; }
   .proj-tabs { flex-direction: row; overflow-x: auto; border-right: none; border-bottom: 1px solid var(--gray-200); }
   .proj-content { grid-template-columns: 1fr; }
   .news-grid { grid-template-columns: 1fr; }
-  .invest-grid { grid-template-columns: 1fr 1fr; }
+  .invest-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .inv-card { padding: 28px 18px; }
+  .inv-title { overflow-wrap: anywhere; hyphens: auto; }
   .disc-tabs { flex-wrap: wrap; }
   .home-modal { padding: 12px; }
   .home-modal__body { padding: 24px 20px; }
