@@ -7,6 +7,16 @@ Thumbs.db
 .env.local
 .env.*.local
 
+# ─── Copies de conflit OneDrive ────────────────────────────────
+# OneDrive duplique un fichier en "nom-NOMDUPC.ext" quand deux appareils
+# le modifient en même temps (ex: actualite-JOHN-BOY.js). Ces doublons ne
+# doivent jamais être commités : on les ignore par motif plutôt qu'un par un.
+*-JOHN-BOY.*
+*-JOHN-BOY
+
+# ─── Config locale Claude Code ─────────────────────────────────
+.claude/settings.local.json
+
 # ─── Node & npm ───────────────────────────────────────────────
 node_modules/
 dist/
