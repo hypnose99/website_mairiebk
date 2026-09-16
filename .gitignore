@@ -16,6 +16,7 @@ Thumbs.db
 
 # ─── Config locale Claude Code ─────────────────────────────────
 .claude/settings.local.json
+Claude outputs/
 
 # ─── Node & npm ───────────────────────────────────────────────
 node_modules/

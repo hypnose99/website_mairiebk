@@ -48,9 +48,15 @@ export default defineNuxtConfig({
         { name: 'robots', content: 'index, follow' },
         { property: 'og:type', content: 'website' },
         { property: 'og:site_name', content: 'Mairie de Bouaké' },
+        { name: 'theme-color', content: '#009640' },
       ],
       link: [
-        { rel: 'icon', type: 'image/png', href: '/icons/icon-96x96.png' },
+        // Icône d'onglet : le .ico embarque 16/32/48 px (c'est lui que Chrome
+        // lit en priorité), le PNG sert aux écrans à forte densité.
+        { rel: 'icon', type: 'image/x-icon', href: '/icons/favicon.ico' },
+        { rel: 'icon', type: 'image/png', sizes: '96x96', href: '/icons/icon-96x96.png' },
+        { rel: 'apple-touch-icon', sizes: '180x180', href: '/icons/apple-touch-icon.png' },
+        { rel: 'manifest', href: '/manifest.json' },
         { rel: 'stylesheet', href: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css' },
       ],
     },
