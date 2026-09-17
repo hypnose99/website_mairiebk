@@ -7,6 +7,7 @@ export default defineEventHandler(async (event) => {
 
   try {
     const params = new URLSearchParams()
+    // Tous les événements publiés sont affichés, y compris ceux dont la date est passée.
     params.append('sort[0]', 'dateDebut:asc')
     params.append('pagination[pageSize]', String(Number(query.perPage) || 6))
     params.append('populate', 'image')

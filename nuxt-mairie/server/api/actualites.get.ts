@@ -1,68 +1,61 @@
 // server/api/actualites.get.ts — Actualités depuis Strapi 5
-import { strapiHeaders, transformActualite } from '~/server/utils/strapi'
+//
+// Paramètres : page, perPage, category (slug), search, featured=true, fields=list
+// Le tri, les filtres et la pagination sont faits par Strapi : la réponse ne
+// dépend plus de la limite de 100 éléments par requête de l'API Strapi.
+import { strapiFetchRange, transformActualite } from '~/server/utils/strapi'
+
+/** Nombre maximum d'articles qu'un appel peut demander (garde-fou). */
+const MAX_PER_PAGE = 500
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const query  = getQuery(event)
 
+  const page     = Math.max(1, Number(query.page) || 1)
+  const perPage  = Math.min(MAX_PER_PAGE, Math.max(1, Number(query.perPage) || 9))
+  const listMode = query.fields === 'list'
+
   const params = new URLSearchParams()
 
   if (query.category) {
-    params.append('filters[categorie][slug][$eq]', query.category as string)
+    params.append('filters[categorie][slug][$eq]', String(query.category))
   }
   if (query.search) {
-    params.append('filters[$or][0][title][$containsi]', query.search as string)
-    params.append('filters[$or][1][excerpt][$containsi]', query.search as string)
+    params.append('filters[$or][0][title][$containsi]', String(query.search))
+    params.append('filters[$or][1][excerpt][$containsi]', String(query.search))
+  }
+  // « À la une » : seulement les articles marqués `featured` dans Strapi
+  if (query.featured === 'true') {
+    params.append('filters[featured][$eq]', 'true')
   }
 
-  // La date métier est prioritaire ; publishedAt reste le second critère pour
-  // les anciens articles qui n'ont pas encore de date_publication.
-  const page    = Number(query.page)    || 1
-  const perPage = Number(query.perPage) || 9
-  // Strapi ne permet pas de trier correctement une date personnalisée avec
-  // fallback quand certaines lignes ont une valeur NULL. On récupère les
-  // articles filtrés, puis on trie sur la date réellement affichée.
-  params.append('pagination[page]', '1')
-  params.append('pagination[pageSize]', '1000')
+  // Date métier d'abord, puis date de publication Strapi pour départager.
+  // Tous les articles ont une date_publication (lifecycle beforeCreate +
+  // migration 20260917000000 pour les anciens), le tri Strapi est donc fiable.
+  params.append('sort[0]', 'date_publication:desc')
+  params.append('sort[1]', 'publishedAt:desc')
 
-  params.append('populate', '*')
+  // Mode « liste » : pas besoin de la galerie, qui pèse l'essentiel de la réponse.
+  params.append('populate[coverImage]', 'true')
+  params.append('populate[categorie]', 'true')
+  if (!listMode) params.append('populate[gallery]', 'true')
 
   try {
-    const response = await $fetch<any>(
-      `${config.strapiUrl}/api/actualites?${params}`,
-      { headers: strapiHeaders() }
-    )
-
-    const items = (response.data ?? []).map((item: any) =>
-      transformActualite(item, config.strapiUrl)
-    )
-    let sortedItems = items.sort((a: any, b: any) => {
-      const dateA = new Date(a.date_publication || a.publishedAt || 0).getTime()
-      const dateB = new Date(b.date_publication || b.publishedAt || 0).getTime()
-      return dateB - dateA
+    const { items, total } = await strapiFetchRange('actualites', params, {
+      start: (page - 1) * perPage,
+      limit: perPage,
     })
-    // "À la une" : ne garder que les articles marqués `featured` dans Strapi
-    if (query.featured === 'true') {
-      sortedItems = sortedItems.filter((a: any) => a.featured)
-    }
-    const start = (page - 1) * perPage
-    let paginatedItems = sortedItems.slice(start, start + perPage)
 
-    // Mode "liste" (?fields=list) : on ne renvoie que ce qu'une carte affiche.
-    // Le corps de l'article et la galerie pèsent l'essentiel de la réponse ;
-    // les écrans qui listent des articles n'en ont aucun usage, et les charger
-    // pour 200 articles alourdit la page pour rien. Le détail d'un article
-    // passe par /api/actualites/[slug], qui renvoie toujours tout.
-    if (query.fields === 'list') {
-      paginatedItems = paginatedItems.map(({ content, gallery, ...card }: any) => card)
+    let result = items.map((item: any) => transformActualite(item, config.strapiUrl))
+
+    // Mode liste : on ne renvoie que ce qu'une carte affiche.
+    // Le détail d'un article passe par /api/actualites/[slug], qui renvoie tout.
+    if (listMode) {
+      result = result.map(({ content, gallery, ...card }: any) => card)
     }
 
-    return {
-      items:   paginatedItems,
-      total:   sortedItems.length,
-      page,
-      perPage,
-    }
+    return { items: result, total, page, perPage }
   }
   catch (err: any) {
     // Ne jamais faire tomber la page : on log et on renvoie une liste vide

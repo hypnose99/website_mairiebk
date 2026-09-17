@@ -10,7 +10,7 @@ const PER_PAGE = 4
 
 // ── Fetch ────────────────────────────────────────────────────────────────────
 const { data, pending } = useFetch<{ items: Actualite[]; total: number }>('/api/actualites', {
-  query: { perPage: 999, fields: 'list' },
+  query: { perPage: 500, fields: 'list' },
   key: 'actu-all',
 })
 

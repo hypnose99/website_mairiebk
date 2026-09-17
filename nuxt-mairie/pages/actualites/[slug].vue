@@ -15,7 +15,7 @@ if (error.value) {
 
 // Articles de la même catégorie (sidebar)
 const { data: relatedData } = useLazyFetch('/api/actualites', {
-  query: { category: article.value?.category, perPage: 6 },
+  query: { category: article.value?.category, perPage: 4, fields: 'list' },
   key: `related-${article.value?.category}`,
 })
 const related = computed(() =>
@@ -24,7 +24,7 @@ const related = computed(() =>
 
 // Articles à la une (sidebar)
 const { data: featuredData } = useLazyFetch('/api/actualites', {
-  query: { perPage: 10 },
+  query: { perPage: 4, featured: 'true', fields: 'list' },
   key: 'featured-articles',
 })
 const featured = computed(() =>

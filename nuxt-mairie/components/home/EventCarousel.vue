@@ -9,7 +9,7 @@ export interface Evenement {
   lieu: string
   image: string | null
   coverImage: string | null
-  href: string
+  href?: string
 }
 
 const props = defineProps<{ events: Evenement[]; pending?: boolean }>()
@@ -65,14 +65,15 @@ onUnmounted(() => clearInterval(timer))
                 <span v-if="ev.heure"><i class="bi bi-clock" /> {{ ev.heure }}</span>
                 <span v-if="ev.lieu"><i class="bi bi-geo-alt" /> {{ ev.lieu }}</span>
               </div>
-              <NuxtLink :to="ev.href" class="ev-link" @click.stop> Détails →</NuxtLink>
+              <!-- Toute la carte ouvre le détail (fenêtre) : pas de lien vers une page /evenements qui n'existe pas -->
+              <span class="ev-link" aria-hidden="true">Détails →</span>
             </div>
           </div>
         </Transition>
       </div>
 
       <div class="vc-controls">
-        <button class="vc-btn" type="button" @click="prev">‹</button>
+        <button class="vc-btn" type="button" aria-label="Événement précédent" @click="prev">‹</button>
         <div class="vc-dots">
           <button
             v-for="(_, i) in events"
@@ -83,7 +84,7 @@ onUnmounted(() => clearInterval(timer))
             @click="idx = i"
           />
         </div>
-        <button class="vc-btn" type="button" @click="next">›</button>
+        <button class="vc-btn" type="button" aria-label="Événement suivant" @click="next">›</button>
       </div>
     </div>
   </div>

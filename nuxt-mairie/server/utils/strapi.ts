@@ -14,9 +14,55 @@ export function slugify(value: unknown): string {
     .replace(/^-+|-+$/g, '')
 }
 
+/**
+ * Slug public d'un article. Le champ `slug` de Strapi (uid) est la référence :
+ * il ne change pas si le titre est modifié, donc les liens partagés restent valides.
+ * Le slug calculé depuis le titre ne sert que pour les anciens articles sans slug.
+ */
 export function actualiteSlug(item: any): string {
   const slug = typeof item?.slug === 'string' ? item.slug.trim() : ''
-  return slugify(item?.title) || slug || item?.documentId || String(item?.id ?? '')
+  return slug || slugify(item?.title) || item?.documentId || String(item?.id ?? '')
+}
+
+/** Nombre maximum d'éléments que l'API REST Strapi renvoie par requête (config/api.js → maxLimit). */
+export const STRAPI_MAX_LIMIT = 100
+
+/**
+ * Récupère jusqu'à `limit` éléments d'une collection Strapi à partir de la position `start`,
+ * en enchaînant autant de requêtes que nécessaire : Strapi plafonne chaque réponse à
+ * `STRAPI_MAX_LIMIT` éléments, et renverrait sinon une liste tronquée sans erreur.
+ * `params` contient les filtres / tris / populate ; la pagination est gérée ici.
+ */
+export async function strapiFetchRange(
+  collection: string,
+  params: URLSearchParams,
+  { start = 0, limit = 25 }: { start?: number; limit?: number } = {},
+): Promise<{ items: any[]; total: number }> {
+  const config = useRuntimeConfig()
+  const items: any[] = []
+  let total = 0
+  let offset = start
+
+  while (items.length < limit) {
+    const pageSize = Math.min(STRAPI_MAX_LIMIT, limit - items.length)
+    const query = new URLSearchParams(params)
+    query.set('pagination[start]', String(offset))
+    query.set('pagination[limit]', String(pageSize))
+    query.set('pagination[withCount]', 'true')
+
+    const response = await $fetch<any>(
+      `${config.strapiUrl}/api/${collection}?${query}`,
+      { headers: strapiHeaders() },
+    )
+    const batch: any[] = response?.data ?? []
+    total = Number(response?.meta?.pagination?.total ?? total)
+    items.push(...batch)
+    offset += batch.length
+
+    if (batch.length < pageSize || offset >= total) break
+  }
+
+  return { items, total }
 }
 
 /** Headers d'authentification Strapi */
@@ -195,6 +241,5 @@ export function transformEvenement(item: any, strapiBase: string) {
     image:       coverImage,
     coverImage,
     featured:    item.featured ?? false,
-    href:        '/evenements',
   }
 }
