@@ -247,7 +247,8 @@ const MONTHS = [
 /* ─── Barre de filtres ──────────────────────────────────────────────────── */
 .fbar-wrap {
   position: sticky;
-  top: 0;
+  /* Collée juste sous le header fixe (sinon elle passe dessous) */
+  top: var(--header-h, 90px);
   z-index: 20;
   background: white;
   border-bottom: 1px solid #EBEBEB;
@@ -546,4 +547,57 @@ const MONTHS = [
 .empty-state i { font-size: 3rem; margin-bottom: 16px; display: block; }
 .empty-state p { font-size: 1rem; margin-bottom: 20px; color: #999; }
 
+/* ─── Responsive ────────────────────────────────────────────────────────── */
+.art-hero > *, .carousel-outer { min-width: 0; }
+
+@media (max-width: 1400px) {
+  /* Plus de marge latérale pour les flèches : elles passent au-dessus des cartes */
+  .carousel-arrow--left  { left: -18px; }
+  .carousel-arrow--right { right: -18px; }
+}
+
+@media (max-width: 1100px) {
+  .actu-page { padding: 0 32px 72px; }
+  /* Tablette/mobile : le carrousel devient une rangée défilable au doigt */
+  .carousel-window {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+  }
+  .carousel-window::-webkit-scrollbar { display: none; }
+  .carousel-track { transform: none !important; }
+  .carousel-track .art-card {
+    flex: 0 0 calc((100% - 28px) / 2.4);
+    scroll-snap-align: start;
+  }
+  .carousel-arrow { display: none; }
+}
+
+@media (max-width: 900px) {
+  .art-hero { grid-template-columns: 1fr; min-height: 0; }
+  .art-hero__img { aspect-ratio: 16 / 9; }
+  .art-hero__body { padding: 28px 28px 32px; }
+  .art-hero__title { font-size: 1.3rem; }
+}
+
+@media (max-width: 768px) {
+  .actu-page { padding: 0 20px 56px; }
+  .fbar-wrap { margin: 0 -20px 32px; padding: 10px 20px; }
+  .fbar { gap: 8px; }
+  .fbar-search { flex: 1 1 100%; min-width: 0; }
+  /* 16px : évite le zoom automatique d'iOS sur les champs */
+  .fbar-search input { font-size: 16px; }
+  .f-select { flex: 1 1 0; min-width: 0; font-size: 0.85rem; padding: 10px 8px; }
+  .f-select:first-of-type { flex-basis: 100%; }
+  .cat-section { margin-bottom: 48px; }
+  .cat-title { white-space: normal; font-size: 0.82rem; letter-spacing: 0.1em; }
+  .art-hero__body { padding: 22px 20px 26px; gap: 10px; }
+  .art-hero__title { font-size: 1.15rem; }
+  .art-hero__excerpt { -webkit-line-clamp: 3; }
+  .carousel-track .art-card { flex-basis: 78%; margin-right: 12px; }
+  .art-card__img { height: 150px; }
+  .empty-state { padding: 56px 12px; }
+}
 </style>

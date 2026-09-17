@@ -283,7 +283,8 @@ const closeProject = () => { selectedProject.value = null }
 /* ─── Filtres ────────────────────────────────────────────────── */
 .pfilters-wrap {
   position: sticky;
-  top: 0;
+  /* Collée juste sous le header fixe (sinon elle passe dessous) */
+  top: var(--header-h, 90px);
   z-index: 20;
   background: white;
   border-bottom: 1px solid #EBEBEB;
@@ -358,8 +359,12 @@ const closeProject = () => { selectedProject.value = null }
   .phero__board { justify-self: start; }
 }
 @media (max-width: 768px) {
-  .phero__inner { padding: 48px 20px 40px; }
-  .pfilters { padding: 0 20px; }
+  .phero__inner { padding: 40px 20px 36px; }
+  .phero__overline { font-size: 0.62rem; letter-spacing: 0.12em; align-items: flex-start; }
+  .phero__title { font-size: clamp(2rem, 10vw, 2.6rem); }
+  .phero__board { width: 100%; padding: 18px 20px 6px; outline-offset: 3px; }
+  .pfilters { padding: 0 20px; gap: 0; scroll-snap-type: x proximity; }
+  .pfilter { padding: 16px 12px 13px; scroll-snap-align: start; }
   .plist { padding: 36px 20px 72px; gap: 40px; }
 }
 </style>

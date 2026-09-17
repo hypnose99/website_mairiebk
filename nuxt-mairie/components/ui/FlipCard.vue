@@ -3,6 +3,9 @@ import type { Adjoint } from '~/types'
 
 defineProps<{ adjoint: Adjoint }>()
 
+// Sur écran tactile il n'y a pas de survol : un appui retourne la carte.
+const flipped = ref(false)
+
 const ordinal = (rank: number) => {
   if (rank === 1) return '1er'
   return `${rank}ème`
@@ -10,7 +13,17 @@ const ordinal = (rank: number) => {
 </script>
 
 <template>
-  <div class="fc-wrap">
+  <div
+    class="fc-wrap"
+    :class="{ 'fc-wrap--flipped': flipped }"
+    role="button"
+    tabindex="0"
+    :aria-pressed="flipped"
+    :aria-label="`Attributions de ${adjoint.firstName} ${adjoint.lastName}`"
+    @click="flipped = !flipped"
+    @keydown.enter.prevent="flipped = !flipped"
+    @keydown.space.prevent="flipped = !flipped"
+  >
     <div class="fc-inner">
 
       <!-- ── FACE AVANT ── -->
@@ -67,7 +80,16 @@ const ordinal = (rank: number) => {
   transform-style: preserve-3d;
   transition: transform 0.65s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.fc-wrap:hover .fc-inner { transform: rotateY(180deg); }
+/* Souris : la carte se retourne au survol */
+@media (hover: hover) {
+  .fc-wrap:hover .fc-inner,
+  .fc-wrap--flipped:focus-visible .fc-inner { transform: rotateY(180deg); }
+}
+/* Écran tactile : pas de survol, la carte se retourne à l'appui */
+@media (hover: none) {
+  .fc-wrap--flipped .fc-inner { transform: rotateY(180deg); }
+}
+.fc-wrap:focus-visible { outline: 3px solid #E65100; outline-offset: 3px; }
 
 /* ── Faces communes ── */
 .fc-front, .fc-back {

@@ -75,7 +75,7 @@ watch(() => props.projets, (projects) => {
 .container-wide { max-width: 1400px; margin: 0 auto; padding: 0 48px; }
 .s-section-head { margin-bottom: 40px; }
 .section-overline { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: #E65100; margin-bottom: 8px; }
-.section-head-row { display: flex; justify-content: space-between; align-items: flex-end; }
+.section-head-row { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 12px 24px; }
 .section-title { font-size: clamp(1.8rem, 3vw, 2.6rem); font-weight: 900; color: #0D0D0D; text-transform: uppercase; letter-spacing: -0.01em; margin: 0; line-height: 1; }
 .section-link { font-size: 0.85rem; font-weight: 700; color: #009640; text-decoration: none; letter-spacing: 0.02em; white-space: nowrap; padding-bottom: 2px; border-bottom: 1px solid #009640; }
 
@@ -115,9 +115,13 @@ watch(() => props.projets, (projects) => {
 .fade-tab-enter-from, .fade-tab-leave-to { opacity: 0; transform: translateY(6px); }
 
 @media (max-width: 768px) {
+  .s-projects { padding: 56px 0; }
   .container-wide { padding: 0 20px; }
   .proj-layout { grid-template-columns: 1fr; }
-  .proj-tabs { flex-direction: row; overflow-x: auto; border-right: none; border-bottom: 1px solid #EBEBEB; }
+  .proj-tabs { flex-direction: row; overflow-x: auto; border-right: none; border-bottom: 1px solid #EBEBEB; scrollbar-width: none; }
+  .proj-tab { flex: 0 0 auto; max-width: 70vw; padding: 14px 16px; border-bottom: none; border-right: 1px solid #EBEBEB; font-size: 0.74rem; }
   .proj-content { grid-template-columns: 1fr; }
+  .proj-info { padding: 24px 20px; }
+  .proj-title { font-size: 1.15rem; }
 }
 </style>

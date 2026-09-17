@@ -459,7 +459,17 @@ const demarches: Demarche[] = [
 .sv-empty__reset:hover { border-color: #009640; color: #009640; }
 
 @media (max-width: 576px) {
-  .sv-hero__inner { padding: 52px 20px 40px; }
-  .sv-search { padding: 2px 14px; }
+  .sv-hero__inner { padding: 40px 20px 36px; }
+  .sv-hero__overline { font-size: 0.62rem; letter-spacing: 0.12em; }
+  .sv-hero__title { font-size: clamp(1.55rem, 7.4vw, 1.9rem); overflow-wrap: anywhere; }
+  .sv-hero__sub { font-size: 0.9rem; margin-bottom: 24px; }
+  .sv-search { padding: 2px 14px; gap: 10px; box-shadow: 4px 4px 0 rgba(0, 150, 64, 0.16); }
+  /* Placeholder plus petit : il tient sur la largeur du téléphone */
+  .sv-search__input { font-size: 16px; padding: 13px 0; min-width: 0; }
+  .sv-search__input::placeholder { font-size: 0.8rem; }
+  .sv-chips { gap: 8px 6px; }
+  .sv-chips__label { width: 100%; text-align: center; }
+  .sv-chip { padding: 8px 14px; }
+  .sv-card { padding: 24px 20px 18px; outline-offset: 2px; }
 }
 </style>

@@ -495,5 +495,9 @@ onMounted(() => {
 @media (max-width: 576px) {
   .pcard__meta { grid-template-columns: 1fr; }
   .pcard__num { display: none; }
+  .pcard__media { min-height: 240px; }
+  .pcard__body { padding: 22px 18px; }
 }
+/* Les colonnes de la grille peuvent rétrécir sous la largeur de leur contenu */
+.pcard > * { min-width: 0; }
 </style>

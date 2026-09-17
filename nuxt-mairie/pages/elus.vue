@@ -12,7 +12,7 @@ useSeoMeta({
 </script>
 
 <template>
-  <div>
+  <div class="elus-page">
 
     <!-- ══ HERO MINISTÉRIEL ════════════════════════════════════ -->
     <section id="le-maire" class="page-hero">
@@ -146,7 +146,7 @@ useSeoMeta({
           <div class="adjoints-head">
             <p class="adjoints-overline">Gouvernance municipale</p>
             <h2 class="adjoints-title">Les Adjoints au Maire</h2>
-            <p class="adjoints-sub">Survolez une carte pour découvrir les attributions de chaque adjoint.</p>
+            <p class="adjoints-sub">Survolez ou touchez une carte pour découvrir les attributions de chaque adjoint.</p>
           </div>
           <div class="adjoints-grid">
             <UiFlipCard
@@ -513,11 +513,77 @@ useSeoMeta({
   gap: 24px;
 }
 
+/* ══ RESPONSIVE ════════════════════════════════════════════════ */
+/* Aucun élément animé ne doit élargir la page */
+.elus-page { overflow-x: hidden; overflow-x: clip; }
+.parcours-inner > * { min-width: 0; }
+
+/* Tablette : paddings réduits, sidebar sous la timeline */
+@media (max-width: 1100px) {
+  .hero-content { width: 60%; padding: 40px 32px 0 40px; }
+  .parcours-inner { grid-template-columns: 1fr; gap: 48px; padding: 0 40px; }
+  .parcours-right {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    align-items: start;
+  }
+  .parcours-right .inst-card { margin-bottom: 0; }
+}
+
+/* Mobile : photo du maire en bandeau au-dessus du texte */
 @media (max-width: 768px) {
+  .page-hero { flex-direction: column; min-height: 0; }
+  .hero-photo-side {
+    position: relative;
+    width: 100%;
+    height: 300px;
+  }
+  .hero-photo-side img { object-position: center 15%; }
+  .hero-photo-fade {
+    background: linear-gradient(to bottom, transparent 55%, #E65100 100%);
+  }
+  .hero-content { width: 100%; padding: 8px 20px 0; }
+  .hero-top { flex-wrap: wrap; gap: 4px 8px; }
+  .hero-text { padding: 20px 0 24px; }
+  .hero-overline { margin-bottom: 14px; }
+  .hero-h1 { font-size: clamp(2.2rem, 11vw, 2.8rem); margin-bottom: 24px; }
+  .hero-identity-role { font-size: 0.72rem; }
+  /* Les 3 onglets se partagent la largeur, texte sur 2 lignes si besoin */
+  .hero-nav { margin: 0 -20px; }
+  .hero-nav-link {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 14px 6px;
+    text-align: center;
+    letter-spacing: 0.08em;
+    line-height: 1.3;
+  }
+  .hero-nav-link:last-child { border-right: none; }
+  .hero-nav-link i { font-size: 0.9rem; }
+
+  .parcours-section { padding: 48px 0; }
+  .parcours-inner { padding: 0 20px; gap: 36px; }
+  .parcours-head { margin-bottom: 32px; }
+  .parcours-right { grid-template-columns: 1fr; }
+  .tl-item { grid-template-columns: 40px 1fr; }
+  .tl-body { padding: 0 0 32px 12px; }
+  .inst-card-header { padding: 20px 18px 16px; }
+  .inst-doc-item { padding: 14px 18px; }
+  .inst-rep-list { padding: 0 18px 6px; }
+
+  .adjoints-section { padding: 48px 0; }
+  .adjoints-head { margin-bottom: 28px; }
   .container-wide { padding: 0 20px; }
-  .adjoints-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .adjoints-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 }
 @media (max-width: 480px) {
   .adjoints-grid { grid-template-columns: 1fr; }
+  .hero-photo-side { height: 260px; }
 }
 </style>

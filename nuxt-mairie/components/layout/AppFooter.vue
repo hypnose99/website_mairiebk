@@ -23,6 +23,7 @@ const year = new Date().getFullYear()
             <li><NuxtLink to="/services">{{ t('nav.services') }}</NuxtLink></li>
             <li><NuxtLink to="/projets">{{ t('nav.projets') }}</NuxtLink></li>
             <li><NuxtLink to="/actualites">{{ t('nav.actualites') }}</NuxtLink></li>
+            <li><NuxtLink to="/opportunites">{{ t('nav.opportunites') }}</NuxtLink></li>
           </ul>
         </div>
 
@@ -61,8 +62,13 @@ const year = new Date().getFullYear()
 }
 
 .footer-logo {
-  height: 50px;
-  filter: brightness(0) invert(1);
+  /* Le logo PNG a un fond opaque : un filtre « blanc » le transformait en
+     rectangle blanc. On l'affiche tel quel sur une pastille claire. */
+  height: 64px;
+  width: auto;
+  background: white;
+  padding: 6px;
+  border-radius: 6px;
   margin-bottom: 16px;
   display: block;
 }
@@ -91,9 +97,11 @@ const year = new Date().getFullYear()
   margin: 0;
 }
 
-.footer-links li { margin-bottom: 8px; }
+.footer-links li { margin-bottom: 4px; }
 
 .footer-links a {
+  display: inline-block;
+  padding: 4px 0; /* zone tactile plus confortable */
   color: #aaa;
   text-decoration: none;
   font-size: 14px;
@@ -111,9 +119,15 @@ const year = new Date().getFullYear()
   color: #aaa;
 }
 
+.footer-contact-list li {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  overflow-wrap: anywhere;
+}
 .footer-contact-list i {
   color: var(--primary-green);
-  margin-right: 8px;
+  flex-shrink: 0;
 }
 
 .footer-divider {
@@ -129,6 +143,8 @@ const year = new Date().getFullYear()
 }
 
 @media (max-width: 768px) {
-  .footer-grid { grid-template-columns: 1fr; gap: 30px; }
+  .app-footer { padding: 44px 0 24px; }
+  .footer-grid { grid-template-columns: 1fr; gap: 28px; margin-bottom: 28px; }
+  .footer-copy { font-size: 12px; line-height: 1.5; }
 }
 </style>

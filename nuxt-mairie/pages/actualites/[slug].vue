@@ -721,7 +721,7 @@ useSeoMeta({
    SIDEBAR — SANS BORDS ARRONDIS
 ════════════════════════════════════════ */
 .article-sidebar {
-  position: sticky; top: 90px;
+  position: sticky; top: calc(var(--header-h, 90px) + 20px);
   display: flex; flex-direction: column; gap: 0;
 }
 .sidebar-block {
@@ -821,11 +821,45 @@ useSeoMeta({
   .mosaic-large { grid-column: span 2; grid-row: span 1; }
 }
 @media (max-width: 600px) {
-  .article-hero { min-height: 420px; }
-  .hero-title { font-size: 24px; }
+  .article-hero { min-height: 360px; }
+  .hero-content { padding-top: 72px; padding-bottom: 36px; }
+  .hero-breadcrumb { flex-wrap: wrap; font-size: 12px; row-gap: 2px; }
+  /* Le dernier maillon (catégorie) reste sur une ligne, tronqué si trop long */
+  .hero-breadcrumb span:last-child {
+    min-width: 0; max-width: 100%;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .hero-title { font-size: 22px; line-height: 1.2; }
   .hero-excerpt { display: none; }
+  .hero-meta { gap: 6px 10px; }
+  .hero-meta-sep { display: none; }
+  .hero-like-btn { padding: 6px 14px; }
+  .hero-scroll-hint { display: none; }
+
+  .article-layout { padding-top: 32px; padding-bottom: 56px; gap: 32px; }
+  .article-content-box { gap: 14px; }
+  .article-content { font-size: 16px; line-height: 1.8; }
+  .article-content :deep(p:first-of-type::first-letter) { font-size: 3.6rem; }
+  .article-content :deep(h2) { font-size: 19px; margin-top: 28px; }
+  .article-content :deep(blockquote) { margin: 24px 0; padding: 16px 18px; font-size: 16px; }
+
   .gallery-mosaic { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 130px; }
   .mosaic-large { grid-column: span 2; grid-row: span 1; }
+
+  /* Boutons de partage : pleine largeur, faciles à toucher */
+  .share-label { width: 100%; }
+  .share-btn { flex: 1 1 0; justify-content: center; padding: 11px 12px; }
+
+  .comment-item { gap: 12px; }
+  .comment-header { flex-wrap: wrap; gap: 2px 10px; }
   .comment-form { padding: 20px 16px; }
+  .form-input { font-size: 16px; } /* évite le zoom automatique d'iOS */
+  .btn-submit-comment, .btn-retour { width: 100%; justify-content: center; padding: 13px 20px; }
+
+  .sidebar-block { padding: 20px 18px; margin-bottom: 20px; }
+
+  .lb-prev { left: 8px; }
+  .lb-next { right: 8px; }
+  .lb-nav { width: 42px; height: 42px; }
 }
 </style>

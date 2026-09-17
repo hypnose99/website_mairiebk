@@ -187,4 +187,10 @@ const shortExcerpt = computed(() => {
   border: 1px solid #EBEBEB;
   color: #999; font-size: 0.85rem;
 }
+@media (max-width: 768px) {
+  .col-chart { padding: 28px 20px 16px; }
+  .pdj__frame { height: 400px; }
+  .pdj__overlay { padding: 28px 18px 18px; }
+  .pdj__title { font-size: 1.1rem; }
+}
 </style>

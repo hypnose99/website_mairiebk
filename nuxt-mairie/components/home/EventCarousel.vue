@@ -131,6 +131,11 @@ onUnmounted(() => clearInterval(timer))
 .ev-link { font-size: 0.8rem; font-weight: 700; color: #009640; text-decoration: none; text-transform: uppercase; }
 
 .vc-controls { display: flex; flex-direction: row; align-items: center; justify-content: space-between; }
+@media (max-width: 768px) {
+  .side-block { padding: 28px 20px; }
+  .vc-btn { width: 40px; height: 40px; } /* cible tactile confortable */
+  .ev-link { display: inline-block; padding: 6px 0; }
+}
 .vc-btn {
   width: 32px; height: 32px; background: #009640; color: white;
   border: none; cursor: pointer; font-size: 1.4rem; line-height: 1;

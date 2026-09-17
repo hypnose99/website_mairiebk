@@ -542,7 +542,7 @@ const heroCaption = computed(() =>
   margin: 0;
   line-height: 1;
 }
-.section-head-row { display: flex; justify-content: space-between; align-items: flex-end; }
+.section-head-row { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 12px 24px; }
 .section-link { font-size: 0.85rem; font-weight: var(--fw-bold); color: var(--green); text-decoration: none; letter-spacing: 0.02em; white-space: nowrap; padding-bottom: 2px; border-bottom: 1px solid var(--green); }
 .s-section-head { margin-bottom: 40px; }
 
@@ -1159,7 +1159,18 @@ const heroCaption = computed(() =>
 @media (max-width: 768px) {
   .container-wide { padding: 0 20px; }
   .s-hero__inner { padding: 28px 20px 28px; }
-  .s-hero__title { font-size: 3rem; }
+  /* 12vw : « DE BOUAKÉ » tient même sur un écran de 320px */
+  .s-hero__title { font-size: clamp(2.2rem, 12vw, 3rem); }
+  .s-hero__overline { align-items: flex-start; font-size: 0.62rem; letter-spacing: 0.12em; }
+  .s-hero__ctas .btn-primary,
+  .s-hero__ctas .btn-outline-ink { flex: 1 1 auto; text-align: center; padding: 13px 18px; }
+  .s-mayor { padding: 56px 0; }
+  .s-mayor__inner { padding: 0 20px; gap: 32px; }
+  .mayor-heading { margin-bottom: 20px; }
+  .mayor-quote { font-size: 1rem; padding-left: 16px; margin-bottom: 24px; }
+  .mayor-text-col .btn-primary { display: block; text-align: center; padding: 14px 16px; }
+  .s-invest { padding: 56px 0; }
+  .s-invest .s-section-head { margin-bottom: 28px; }
   .s-quicknav__inner { padding: 0 20px; }
   .proj-layout { grid-template-columns: 1fr; }
   .proj-tabs { flex-direction: row; overflow-x: auto; border-right: none; border-bottom: 1px solid var(--gray-200); }

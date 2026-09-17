@@ -14,6 +14,12 @@
   --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.06);
   --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.1);
   --transition: 0.25s ease;
+  /* Hauteur du header fixe : utilisée par le layout (padding-top) et par les
+     barres collantes (filtres) pour se placer juste sous le header. */
+  --header-h: 90px;
+}
+@media (max-width: 768px) {
+  :root { --header-h: 68px; }
 }
 
 /* ── Transitions de page (globales, cf. nuxt.config.ts) ───────── */
@@ -35,6 +41,7 @@ body {
   padding: 0;
   background-color: var(--bg-color);
   overflow-x: hidden;
+  overflow-x: clip;
   color: var(--text-color);
   line-height: 1.6;
 }
@@ -943,4 +950,20 @@ svg.main-svg {
   .mayor-name-side h1 { font-size: 36px; }
   .project-meta-grid { grid-template-columns: 1fr; }
   .elus-hero-card { padding: 20px; margin-top: -30px; }
+}
+
+/* ── Garde-fous responsive (mobile) ─────────────────────────────
+   - Aucun défilement horizontal : html et body coupent ce qui dépasse
+     (overflow-x: clip ne crée pas de conteneur de défilement et
+     n'empêche donc pas position: sticky).
+   - Les médias ne dépassent jamais de leur conteneur.
+   - Les mots très longs (titres en majuscules, URL) passent à la ligne.
+   - Les .container Bootstrap gardent 20px de marge latérale sur mobile
+     (12px par défaut, trop serré pour du texte).
+────────────────────────────────────────────────────────────── */
+html { overflow-x: clip; } /* pas de repli « hidden » ici : il casserait position: sticky */
+img, video, iframe { max-width: 100%; }
+h1, h2, h3, h4, h5, h6, p, li, a, button, label { overflow-wrap: break-word; }
+@media (max-width: 576px) {
+  .container, .container-fluid { padding-left: 20px; padding-right: 20px; }
 }

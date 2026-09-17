@@ -148,4 +148,9 @@ onUnmounted(() => clearInterval(timer))
   padding: 0; transition: background 0.2s, transform 0.2s;
 }
 .vc-dot--active { background: #E65100; transform: scale(1.4); }
+@media (max-width: 768px) {
+  .side-block { padding: 28px 20px; }
+  .vc-btn { width: 40px; height: 40px; } /* cible tactile confortable */
+  .flash-link { display: inline-block; padding: 6px 0; }
+}
 </style>

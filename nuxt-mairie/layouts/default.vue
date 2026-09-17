@@ -25,7 +25,7 @@
 
 .layout-main {
   flex: 1;
-  padding-top: 90px; /* Hauteur du header fixe */
+  padding-top: var(--header-h, 90px); /* Hauteur du header fixe (cf. main.css) */
 }
 
 .skip-link {

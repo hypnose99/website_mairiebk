@@ -91,5 +91,18 @@ const activeTab = computed(() => props.tabs.find(t => t.id === activeId.value))
 .fade-tab-enter-from, .fade-tab-leave-to { opacity: 0; transform: translateY(6px); }
 
 @media (max-width: 1100px) { .place-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 768px) { .container-wide { padding: 0 20px; } .disc-tabs { flex-wrap: wrap; } }
+@media (max-width: 768px) {
+  .s-discover { padding: 56px 0; }
+  .s-section-head { margin-bottom: 24px; }
+  .container-wide { padding: 0 20px; }
+  /* Onglets : une seule rangée défilable plutôt qu'un empilement irrégulier */
+  .disc-tabs { width: 100%; overflow-x: auto; scrollbar-width: none; margin-bottom: 24px; }
+  .disc-tabs::-webkit-scrollbar { display: none; }
+  .disc-pill { flex: 0 0 auto; padding: 12px 16px; white-space: nowrap; }
+  .disc-empty { padding: 40px 20px; }
+}
+@media (max-width: 480px) {
+  .place-grid { grid-template-columns: 1fr; }
+  .place-img { height: 180px; }
+}
 </style>

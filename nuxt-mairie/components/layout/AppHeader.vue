@@ -106,7 +106,7 @@ watch(() => route.path, () => appStore.closeMobileMenu())
   display: flex;
   align-items: center;
   padding: 0 50px;
-  height: 90px;
+  height: var(--header-h, 90px);
 }
 
 .header-logo {
@@ -198,6 +198,10 @@ watch(() => route.path, () => appStore.closeMobileMenu())
   background: white;
   border-top: 1px solid #f0f0f0;
   padding: 10px 0;
+  /* Menu défilable s'il dépasse la hauteur de l'écran (petit téléphone, paysage) */
+  max-height: calc(100vh - var(--header-h, 90px));
+  max-height: calc(100dvh - var(--header-h, 90px));
+  overflow-y: auto;
 }
 
 .mobile-nav-link {
@@ -223,9 +227,29 @@ watch(() => route.path, () => appStore.closeMobileMenu())
   transform: translateY(-10px);
 }
 
+/* Écrans intermédiaires : 6 liens + langues doivent tenir sur une ligne */
+@media (max-width: 1200px) {
+  .header-inner { padding: 0 32px; }
+  .header-logo { margin-right: 24px; }
+  .nav-link { margin: 0 10px; font-size: 15px; }
+}
 @media (max-width: 992px) {
   .header-inner { padding: 0 20px; }
   .header-nav { display: none; }
-  .burger-btn { display: flex; }
+  /* Cibles tactiles d'au moins 40px */
+  .burger-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 44px;
+    height: 44px;
+    margin-right: -10px;
+  }
+  .lang-btn { min-width: 38px; min-height: 34px; padding: 4px 8px; font-size: 13px; }
+  .header-actions { gap: 10px; }
+  .mobile-nav-link { padding: 16px 24px; }
+}
+@media (max-width: 768px) {
+  .logo-img { height: 48px; }
 }
 </style>

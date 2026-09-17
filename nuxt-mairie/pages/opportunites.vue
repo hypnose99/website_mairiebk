@@ -356,7 +356,8 @@ const isUrgent = (d: string) => {
 /* ─── Filtres ────────────────────────────────────────────────── */
 .ofilters-wrap {
   position: sticky;
-  top: 0;
+  /* Collée juste sous le header fixe (sinon elle passe dessous) */
+  top: var(--header-h, 90px);
   z-index: 20;
   background: white;
   border-bottom: 1px solid #EBEBEB;
@@ -565,9 +566,15 @@ const isUrgent = (d: string) => {
 
 /* ─── Responsive ─────────────────────────────────────────────── */
 @media (max-width: 768px) {
-  .ohero__inner { padding: 48px 20px 40px; }
-  .ofilters { padding: 0 20px; }
-  .olist { padding: 32px 20px 64px; }
+  .ohero__inner { padding: 40px 20px 36px; }
+  .ohero__overline { font-size: 0.62rem; letter-spacing: 0.12em; align-items: flex-start; }
+  .ohero__title { font-size: clamp(1.8rem, 8.5vw, 2.4rem); }
+  .ofilters { padding: 0 20px; gap: 0; scroll-snap-type: x proximity; }
+  .ofilter { padding: 16px 12px 13px; scroll-snap-align: start; }
+  .olist { padding: 28px 20px 64px; gap: 18px; }
+  .ocard { outline-offset: 2px; }
+  .ocard__body { padding: 20px 18px 18px; }
+  .ocard__meta { gap: 8px 16px; flex-wrap: wrap; }
   .ocard { grid-template-columns: 1fr; }
   .ocard__side {
     flex-direction: row;
