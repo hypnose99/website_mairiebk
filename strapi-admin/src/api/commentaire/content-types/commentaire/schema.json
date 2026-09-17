@@ -1,0 +1,33 @@
+{
+  "kind": "collectionType",
+  "collectionName": "commentaires",
+  "info": {
+    "singularName": "commentaire",
+    "pluralName": "commentaires",
+    "displayName": "Commentaire",
+    "description": "Commentaires des visiteurs sur les actualités. Un commentaire n'apparaît sur le site qu'une fois publié par la mairie (modération)."
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "nom": {
+      "type": "string",
+      "required": true,
+      "minLength": 2,
+      "maxLength": 60
+    },
+    "texte": {
+      "type": "text",
+      "required": true,
+      "minLength": 3,
+      "maxLength": 1000
+    },
+    "actualite": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::actualite.actualite"
+    }
+  }
+}

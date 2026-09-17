@@ -77,13 +77,23 @@ const isLiked    = ref(false)
 const likeCount  = ref(0)
 const likePending = ref(false)
 
-// ── Commentaires ──
+// ── Commentaires (Strapi, avec modération) ──
+// Seuls les commentaires validés par la mairie sont renvoyés par l'API.
 interface ArticleComment {
-  id: string; name: string; text: string; date: string
+  id: string; name: string; text: string; date: string | null
 }
-const comments   = ref<ArticleComment[]>([])
-const commentForm = reactive({ name: '', text: '' })
-const commentSent = ref(false)
+const { data: commentsData } = useLazyFetch<{ total: number; items: ArticleComment[] }>(
+  () => `/api/actualites/${encodeURIComponent(article.value?.id ?? slug.value)}/commentaires`,
+  { key: `comments-${slug.value}`, default: () => ({ total: 0, items: [] }) },
+)
+const comments = computed(() => commentsData.value?.items ?? [])
+
+// `website` : champ piège invisible (anti-robots), doit rester vide
+const commentForm    = reactive({ name: '', text: '', website: '' })
+const commentSent    = ref(false)
+const commentError   = ref('')
+const commentPending = ref(false)
+const COMMENT_MAX    = 1000
 
 onMounted(async () => {
   await refreshArticle({ dedupe: 'defer' })
@@ -109,9 +119,6 @@ onMounted(async () => {
       // Le compteur initial reste visible si l'incrémentation échoue.
     }
   }
-  // Commentaires
-  const raw = localStorage.getItem(`cm_${slug.value}`)
-  if (raw) comments.value = JSON.parse(raw)
 })
 
 async function toggleLike() {
@@ -145,21 +152,36 @@ async function toggleLike() {
 
   likePending.value = false
 }
-function submitComment() {
-  if (!commentForm.name.trim() || !commentForm.text.trim()) return
-  const c: ArticleComment = {
-    id: Date.now().toString(),
-    name: commentForm.name.trim(),
-    text: commentForm.text.trim(),
-    date: new Date().toISOString(),
+async function submitComment() {
+  commentError.value = ''
+  const name = commentForm.name.trim()
+  const text = commentForm.text.trim()
+  if (name.length < 2) { commentError.value = 'Indiquez votre nom (2 caractères minimum).'; return }
+  if (text.length < 3) { commentError.value = 'Votre commentaire est trop court.'; return }
+  if (commentPending.value) return
+
+  commentPending.value = true
+  try {
+    const identifier = article.value?.id ?? slug.value
+    await $fetch(`/api/actualites/${encodeURIComponent(identifier)}/commentaires`, {
+      method: 'POST',
+      body: { name, text, website: commentForm.website },
+    })
+    commentForm.name = ''
+    commentForm.text = ''
+    commentSent.value = true
+    setTimeout(() => { commentSent.value = false }, 8000)
   }
-  comments.value.unshift(c)
-  localStorage.setItem(`cm_${slug.value}`, JSON.stringify(comments.value))
-  commentForm.name = ''; commentForm.text = ''
-  commentSent.value = true
-  setTimeout(() => commentSent.value = false, 4000)
+  catch (err: any) {
+    commentError.value = err?.data?.statusMessage || err?.statusMessage
+      || "Le commentaire n'a pas pu être envoyé. Réessayez plus tard."
+  }
+  finally {
+    commentPending.value = false
+  }
 }
-function commentDate(iso: string) {
+function commentDate(iso: string | null) {
+  if (!iso) return ''
   return new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(iso))
 }
 function initials(name: string) {
@@ -304,7 +326,7 @@ useSeoMeta({
         <section class="comments-section">
           <div class="block-label" :style="{ borderColor: catColor, color: catColor }">
             <i class="bi bi-chat-dots" /> Commentaires
-            <span class="comments-count">{{ comments.length }}</span>
+            <span class="comments-count">{{ commentsData?.total ?? comments.length }}</span>
           </div>
 
           <!-- Liste -->
@@ -325,34 +347,60 @@ useSeoMeta({
           <!-- Formulaire -->
           <div class="comment-form">
             <h4 class="comment-form-title">Laisser un commentaire</h4>
+            <p class="comment-form-note">
+              Les commentaires sont relus par la Mairie avant d'être publiés.
+              Merci de rester courtois : les propos injurieux ou hors sujet ne seront pas publiés.
+            </p>
             <Transition name="fade">
-              <div v-if="commentSent" class="comment-success">
-                <i class="bi bi-check-circle-fill" /> Commentaire publié avec succès.
+              <div v-if="commentSent" class="comment-success" role="status">
+                <i class="bi bi-check-circle-fill" /> Merci ! Votre commentaire a bien été envoyé.
+                Il apparaîtra ici après validation par la Mairie.
               </div>
             </Transition>
-            <div class="form-row">
-              <input
-                v-model="commentForm.name"
-                type="text"
-                placeholder="Votre nom *"
-                class="form-input"
-              />
+            <div v-if="commentError" class="comment-error" role="alert">
+              <i class="bi bi-exclamation-triangle-fill" /> {{ commentError }}
             </div>
-            <div class="form-row">
-              <textarea
-                v-model="commentForm.text"
-                placeholder="Votre commentaire *"
-                rows="4"
-                class="form-input form-textarea"
-              />
-            </div>
-            <button
-              class="btn-submit-comment"
-              :style="{ background: catColor }"
-              @click="submitComment"
-            >
-              <i class="bi bi-send" /> Publier
-            </button>
+            <form @submit.prevent="submitComment">
+              <div class="form-row">
+                <label class="visually-hidden" for="comment-name">Votre nom</label>
+                <input
+                  id="comment-name"
+                  v-model="commentForm.name"
+                  type="text"
+                  placeholder="Votre nom *"
+                  class="form-input"
+                  maxlength="60"
+                  autocomplete="name"
+                  required
+                />
+              </div>
+              <div class="form-row">
+                <label class="visually-hidden" for="comment-text">Votre commentaire</label>
+                <textarea
+                  id="comment-text"
+                  v-model="commentForm.text"
+                  placeholder="Votre commentaire *"
+                  rows="4"
+                  class="form-input form-textarea"
+                  :maxlength="COMMENT_MAX"
+                  required
+                />
+                <span class="comment-counter">{{ commentForm.text.length }} / {{ COMMENT_MAX }}</span>
+              </div>
+              <!-- Piège anti-robots : invisible et ignoré par les lecteurs d'écran -->
+              <div class="comment-hp" aria-hidden="true">
+                <label for="comment-website">Ne pas remplir</label>
+                <input id="comment-website" v-model="commentForm.website" type="text" tabindex="-1" autocomplete="off" />
+              </div>
+              <button
+                type="submit"
+                class="btn-submit-comment"
+                :style="{ background: catColor }"
+                :disabled="commentPending"
+              >
+                <i class="bi bi-send" /> {{ commentPending ? 'Envoi…' : 'Envoyer' }}
+              </button>
+            </form>
           </div>
         </section>
 
@@ -703,6 +751,17 @@ useSeoMeta({
   font-size: 14px; font-weight: 700; cursor: pointer; transition: opacity 0.2s;
 }
 .btn-submit-comment:hover { opacity: 0.88; }
+.btn-submit-comment:disabled { opacity: 0.6; cursor: wait; }
+.comment-form-note { font-size: 13px; color: #777; line-height: 1.5; margin: -8px 0 16px; }
+.comment-error {
+  display: flex; align-items: center; gap: 8px;
+  color: #b71c1c; background: #fdecea; padding: 12px 16px;
+  font-size: 14px; font-weight: 600; margin-bottom: 16px;
+  border-left: 4px solid #b71c1c;
+}
+.comment-counter { display: block; text-align: right; font-size: 12px; color: #aaa; margin-top: 4px; }
+/* Champ piège anti-robots : hors écran */
+.comment-hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
 
 /* Transition */
 .fade-enter-active, .fade-leave-active { transition: opacity 0.4s; }

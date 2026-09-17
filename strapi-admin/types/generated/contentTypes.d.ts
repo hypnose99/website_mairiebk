@@ -579,6 +579,50 @@ export interface ApiCategorieActualiteCategorieActualite
   };
 }
 
+export interface ApiCommentaireCommentaire extends Struct.CollectionTypeSchema {
+  collectionName: 'commentaires';
+  info: {
+    description: "Commentaires des visiteurs sur les actualit\u00E9s. Un commentaire n'appara\u00EEt sur le site qu'une fois publi\u00E9 par la mairie (mod\u00E9ration).";
+    displayName: 'Commentaire';
+    pluralName: 'commentaires';
+    singularName: 'commentaire';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    actualite: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::actualite.actualite'
+    >;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::commentaire.commentaire'
+    > &
+      Schema.Attribute.Private;
+    nom: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 60;
+        minLength: 2;
+      }>;
+    publishedAt: Schema.Attribute.DateTime;
+    texte: Schema.Attribute.Text &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 1000;
+        minLength: 3;
+      }>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiEvenementEvenement extends Struct.CollectionTypeSchema {
   collectionName: 'evenements';
   info: {
@@ -1207,6 +1251,7 @@ declare module '@strapi/strapi' {
       'admin::user': AdminUser;
       'api::actualite.actualite': ApiActualiteActualite;
       'api::categorie-actualite.categorie-actualite': ApiCategorieActualiteCategorieActualite;
+      'api::commentaire.commentaire': ApiCommentaireCommentaire;
       'api::evenement.evenement': ApiEvenementEvenement;
       'api::flash-info.flash-info': ApiFlashInfoFlashInfo;
       'api::projet.projet': ApiProjetProjet;
