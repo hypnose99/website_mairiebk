@@ -97,20 +97,5 @@ export default defineNuxtConfig({
     compressPublicAssets: true,
   },
 
-  // ─── Cache des routes API (lecture seule) ─────────────────────────────────
-  // Chaque visite de l'accueil interrogeait Strapi plusieurs fois. Les listes
-  // sont désormais gardées en mémoire quelques instants (clé = URL + paramètres).
-  // `swr` : on sert la version en cache tout de suite et on la rafraîchit en
-  // arrière-plan. Un contenu publié dans Strapi apparaît donc en 1 à 5 min.
-  // Le détail d'un article (/api/actualites/[slug]) et les compteurs
-  // vues / « j'aime » ne sont PAS mis en cache.
-  routeRules: {
-    '/api/actualites':            { cache: { maxAge: 60,  swr: true } },
-    '/api/categories-actualites': { cache: { maxAge: 300, swr: true } },
-    '/api/evenements':            { cache: { maxAge: 120, swr: true } },
-    '/api/flash-info':            { cache: { maxAge: 60,  swr: true } },
-    '/api/projects':              { cache: { maxAge: 120, swr: true } },
-  },
-
   compatibilityDate: '2024-10-01',
 })

@@ -8,7 +8,7 @@ import { strapiFetchRange, transformActualite } from '~/server/utils/strapi'
 /** Nombre maximum d'articles qu'un appel peut demander (garde-fou). */
 const MAX_PER_PAGE = 500
 
-export default defineEventHandler(async (event) => {
+export default defineCachedEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const query  = getQuery(event)
 
@@ -63,4 +63,15 @@ export default defineEventHandler(async (event) => {
     console.error('[api/actualites] Strapi error:', err?.statusCode ?? err?.message)
     return { items: [], total: 0, page, perPage }
   }
+}, {
+  // Mise en cache courte de la réponse.
+  // ⚠️ `getKey` inclut la query string : par défaut Nitro ne garde que le chemin,
+  // si bien que /api/actualites?a=1 et /api/actualites?a=2 partageaient la même entrée de
+  // cache et renvoyaient le même contenu.
+  maxAge: 60,
+  swr: true,
+  getKey: event => event.path,
+  // En développement, pas de cache : un contenu modifié dans Strapi apparaît
+  // immédiatement au rechargement de la page.
+  shouldBypassCache: () => import.meta.dev,
 })

@@ -3,7 +3,7 @@ import { strapiHeaders, transformProject } from '~/server/utils/strapi'
 import projectsData from '~/data/projects.json'
 import type { ProjectStatus } from '~/types'
 
-export default defineEventHandler(async (event) => {
+export default defineCachedEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const query  = getQuery(event)
 
@@ -63,4 +63,15 @@ export default defineEventHandler(async (event) => {
 
     return results
   }
+}, {
+  // Mise en cache courte de la réponse.
+  // ⚠️ `getKey` inclut la query string : par défaut Nitro ne garde que le chemin,
+  // si bien que /api/projects?a=1 et /api/projects?a=2 partageaient la même entrée de
+  // cache et renvoyaient le même contenu.
+  maxAge: 60,
+  swr: true,
+  getKey: event => event.path,
+  // En développement, pas de cache : un contenu modifié dans Strapi apparaît
+  // immédiatement au rechargement de la page.
+  shouldBypassCache: () => import.meta.dev,
 })
