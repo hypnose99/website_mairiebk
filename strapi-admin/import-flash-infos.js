@@ -1,93 +1,104 @@
-// import-flash-infos.js — Importe les flash infos dans Strapi 5
-// Usage : node import-flash-infos.js (depuis le dossier strapi-admin)
+// import-flash-infos.js — Recopie les flash infos de la production dans le Strapi local
+//
+// Complete import-depuis-prod.js, qui ne traite pas ce type de contenu.
+// Les entrees sont creees publiees. Relancable sans risque : une flash info dont
+// le titre existe deja est ignoree.
+//
+// Usage (depuis le dossier strapi-admin, Strapi local demarre) :
+//   node import-flash-infos.js --dry   → affiche ce qui serait cree, n'ecrit rien
+//   node import-flash-infos.js
+//
+// Droits necessaires sur le jeton local : Flash-info → find + create
 
-const STRAPI_URL = 'http://localhost:1337'
-const TOKEN      = 'd691a634b54b6e4239b4bfa54647a918e9a683d4f81d203359af414452c26d1e0d6fdf634d89f4a50d2602661f1253d20db7fcc1dfdcb458dba192cffd10f0448494a8d0adb92f9dcab61336e285cdf9b148ae93a3b58703d613441035debb8faefff0d9cf62b9b9499cf64caafd1c8457b49ba0cc03f4810b56214fc11b769c'
+try { process.loadEnvFile() } catch { /* .env optionnel */ }
 
-const headers = {
-  'Authorization': `Bearer ${TOKEN}`,
-  'Content-Type':  'application/json',
+const SOURCE_URL = (process.env.SOURCE_URL || 'https://www.mairiedebouake.ci').replace(/\/$/, '')
+const LOCAL_URL  = (process.env.STRAPI_URL || 'http://localhost:1337').replace(/\/$/, '')
+const TOKEN      = process.env.STRAPI_TOKEN || process.env.STRAPI_API_TOKEN || ''
+
+const DRY = process.argv.slice(2).includes('--dry')
+
+if (!TOKEN) {
+  throw new Error('Jeton Strapi manquant : definis STRAPI_TOKEN dans strapi-admin/.env')
+}
+if (LOCAL_URL.includes('mairiedebouake.ci') || LOCAL_URL.includes('onrender.com')) {
+  throw new Error(`Refus d'ecrire sur ${LOCAL_URL} : ce script n'ecrit que dans un Strapi local.`)
 }
 
-const flashInfos = [
-  {
-    titre:   'Travaux rue du Commerce',
-    contenu: 'Fermeture temporaire de la rue du Commerce du 5 au 20 juillet pour travaux de réfection de chaussée. Déviation par l\'avenue Houphouët-Boigny.',
-    type:    'travaux',
-    actif:   true,
-  },
-  {
-    titre:   'Résultats bourses municipales 2026',
-    contenu: 'Les résultats des bourses d\'études municipales 2026 sont disponibles. Consultez la liste des bénéficiaires à l\'accueil de la mairie ou sur ce portail.',
-    type:    'info',
-    actif:   true,
-  },
-  {
-    titre:   'Coupure d\'eau quartier Air France',
-    contenu: 'Une interruption de la distribution d\'eau est prévue le 8 juillet de 8h à 16h dans le quartier Air France pour maintenance du réseau SODECI.',
-    type:    'alerte',
-    actif:   true,
-  },
-  {
-    titre:   'Inscription état civil — nouveaux horaires',
-    contenu: 'Le service état civil est désormais ouvert du lundi au vendredi de 7h30 à 16h00 sans interruption. Fermeture le samedi.',
-    type:    'info',
-    actif:   true,
-  },
-  {
-    titre:   'Appel à candidatures — Conseil municipal jeunes',
-    contenu: 'La mairie de Bouaké lance un appel à candidatures pour le Conseil Municipal des Jeunes 2026–2028. Dépôt des dossiers jusqu\'au 31 juillet.',
-    type:    'info',
-    actif:   true,
-  },
-]
+const headers = { Authorization: `Bearer ${TOKEN}`, 'Content-Type': 'application/json' }
+const norm = (v) => String(v ?? '').trim().toLowerCase()
 
-async function importFlashInfo(flash) {
-  // 1. Création
-  const createRes = await fetch(`${STRAPI_URL}/api/flash-infos`, {
-    method:  'POST',
-    headers,
-    body: JSON.stringify({ data: flash }),
-  })
+const main = async () => {
+  // --- Source : l'API publique du site en ligne ---
+  const res = await fetch(`${SOURCE_URL}/api/flash-info`)
+  if (!res.ok) throw new Error(`Source /api/flash-info : HTTP ${res.status}`)
+  const source = await res.json()
+  const entrees = Array.isArray(source) ? source : (source.items || source.data || [])
+  console.log(`Source : ${entrees.length} flash info(s) sur ${SOURCE_URL}`)
 
-  if (!createRes.ok) {
-    const err = await createRes.json()
-    throw new Error(err?.error?.message ?? JSON.stringify(err).slice(0, 200))
+  // --- Existant en local, pour ne pas creer de doublon ---
+  const resLocal = await fetch(`${LOCAL_URL}/api/flash-infos?pagination[limit]=200&status=published`, { headers })
+  if (!resLocal.ok) {
+    throw new Error(`Local : HTTP ${resLocal.status} — verifie les droits find sur Flash-info`)
   }
+  const local = await resLocal.json()
+  const dejaLa = new Set((local.data || []).map((e) => norm(e.titre)))
 
-  const created    = await createRes.json()
-  const documentId = created.data?.documentId
-  if (!documentId) throw new Error('documentId manquant')
+  let crees = 0
+  let ignores = 0
 
-  // 2. Publication
-  await fetch(`${STRAPI_URL}/api/flash-infos/${documentId}/actions/publish`, {
-    method: 'POST',
-    headers,
-  })
-
-  return documentId
-}
-
-async function main() {
-  console.log(`\n⚡ Import de ${flashInfos.length} flash infos...\n`)
-  let success = 0, errors = 0
-
-  for (const flash of flashInfos) {
-    try {
-      await importFlashInfo(flash)
-      console.log(`  ✅  [${flash.type.toUpperCase()}] ${flash.titre}`)
-      success++
-    } catch (err) {
-      console.error(`  ❌  ${flash.titre}: ${err.message}`)
-      errors++
+  for (const e of entrees) {
+    if (dejaLa.has(norm(e.titre))) {
+      ignores++
+      continue
     }
-    await new Promise(r => setTimeout(r, 200))
+
+    // Seuls les champs declares dans schema.json : titre, contenu, type, actif.
+    const data = {
+      titre:   e.titre,
+      contenu: e.contenu,
+      type:    e.type || 'info',
+      actif:   e.actif !== false,
+    }
+
+    if (DRY) {
+      console.log(`  [simulation] creerait : ${data.titre}`)
+      crees++
+      continue
+    }
+
+    const r = await fetch(`${LOCAL_URL}/api/flash-infos?status=published`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ data }),
+    })
+    const texte = await r.text()
+    if (!r.ok) {
+      console.error(`  echec "${data.titre}" : HTTP ${r.status} — ${texte.slice(0, 250)}`)
+      continue
+    }
+
+    // draft & publish : selon la version de Strapi, ?status=published n'est pas
+    // toujours pris en compte a la creation. On publie explicitement si besoin.
+    let cree = null
+    try { cree = JSON.parse(texte).data } catch { /* reponse inattendue */ }
+    if (cree?.documentId && !cree?.publishedAt) {
+      await fetch(`${LOCAL_URL}/api/flash-infos/${cree.documentId}?status=published`, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify({ data: {} }),
+      })
+    }
+
+    console.log(`  cree : ${data.titre}`)
+    crees++
   }
 
-  console.log(`\n─────────────────────────────────────────`)
-  console.log(`✅ Réussis : ${success} / ${flashInfos.length}`)
-  console.log(`❌ Erreurs : ${errors}`)
-  console.log(`─────────────────────────────────────────\n`)
+  console.log(`\n=== Termine ===`)
+  console.log(`  flash infos : ${crees} ${DRY ? 'a creer' : 'cree(s)'}, ${ignores} deja presente(s)`)
 }
 
-main().catch(console.error)
+main().catch((err) => {
+  console.error(err.message)
+  process.exit(1)
+})

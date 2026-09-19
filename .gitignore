@@ -74,3 +74,6 @@ yarn-error.log*
 .turbo/
 dist/
 coverage/
+
+# Sauvegardes de base de donnees
+sauvegardes/

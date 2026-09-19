@@ -68,7 +68,7 @@ export default defineCachedEventHandler(async (event) => {
   // ⚠️ `getKey` inclut la query string : par défaut Nitro ne garde que le chemin,
   // si bien que /api/actualites?a=1 et /api/actualites?a=2 partageaient la même entrée de
   // cache et renvoyaient le même contenu.
-  maxAge: 60,
+  maxAge: 300,
   swr: true,
   getKey: event => event.path,
   // En développement, pas de cache : un contenu modifié dans Strapi apparaît

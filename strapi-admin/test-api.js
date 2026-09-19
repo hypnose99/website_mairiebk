@@ -1,8 +1,15 @@
 // test-api.js — Diagnostic de l'API Strapi
 // Usage : node test-api.js
 
-const STRAPI_URL = 'http://localhost:1337'
-const TOKEN      = 'd691a634b54b6e4239b4bfa54647a918e9a683d4f81d203359af414452c26d1e0d6fdf634d89f4a50d2602661f1253d20db7fcc1dfdcb458dba192cffd10f0448494a8d0adb92f9dcab61336e285cdf9b148ae93a3b58703d613441035debb8faefff0d9cf62b9b9499cf64caafd1c8457b49ba0cc03f4810b56214fc11b769c'
+try { process.loadEnvFile() } catch { /* .env optionnel */ }
+
+const STRAPI_URL = (process.env.STRAPI_URL || 'http://localhost:1337').replace(/\/$/, '')
+const TOKEN      = process.env.STRAPI_TOKEN || process.env.STRAPI_API_TOKEN || ''
+
+if (!TOKEN) {
+  console.error('Jeton Strapi manquant : definis STRAPI_TOKEN dans strapi-admin/.env')
+  process.exit(1)
+}
 
 async function test(label, url, options = {}) {
   try {
