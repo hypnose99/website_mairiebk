@@ -29,7 +29,13 @@ export default defineNuxtPlugin(() => {
     }],
   })
 
+  // Dernière page annoncée : évite de compter deux fois la page d'arrivée,
+  // car le routeur déclenche aussi afterEach pour la navigation initiale.
+  let lastPath = ''
+
   const sendPageView = (path: string) => {
+    if (path === lastPath) return
+    lastPath = path
     gtag('event', 'page_view', {
       page_path: path,
       page_location: window.location.href,
