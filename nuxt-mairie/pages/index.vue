@@ -1,7 +1,54 @@
 <script setup lang="ts">
 useSeoMeta({
   title: 'Accueil',
-  description: 'Site officiel de la Mairie de Bouaké, capitale économique du centre de la Côte d\'Ivoire.',
+  description: 'Site officiel de la Mairie de Bouaké : démarches administratives, actualités, grands projets, événements et opportunités de la commune.',
+  ogTitle: 'Mairie de Bouaké — Site officiel',
+  ogDescription: 'Démarches, actualités, projets et vie de la commune de Bouaké, capitale du Gbêkê.',
+})
+
+// ── Données structurées : dit à Google qui est la Mairie de Bouaké ─────────
+// Utilisées pour le bloc d'informations à droite des résultats de recherche
+// et pour la recherche interne au site.
+const siteUrl = String(useRuntimeConfig().public.siteUrl || '').replace(/\/$/, '')
+useHead({
+  script: [
+    {
+      type: 'application/ld+json',
+      innerHTML: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'GovernmentOrganization',
+        name: 'Mairie de Bouaké',
+        alternateName: 'Commune de Bouaké',
+        url: siteUrl,
+        logo: `${siteUrl}/images/logo.png`,
+        slogan: 'De nombreux peuples, une seule cité',
+        areaServed: { '@type': 'City', name: 'Bouaké', addressCountry: 'CI' },
+        address: {
+          '@type': 'PostalAddress',
+          streetAddress: 'Hôtel de Ville, Avenue de la Paix',
+          addressLocality: 'Bouaké',
+          addressRegion: 'Gbêkê',
+          addressCountry: 'CI',
+        },
+        contactPoint: [{
+          '@type': 'ContactPoint',
+          contactType: 'Accueil',
+          email: 'contact@mairie-bouake.ci',
+          availableLanguage: ['fr'],
+        }],
+      }),
+    },
+    {
+      type: 'application/ld+json',
+      innerHTML: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        name: 'Mairie de Bouaké',
+        url: siteUrl,
+        inLanguage: 'fr-CI',
+      }),
+    },
+  ],
 })
 
 // ── Articles depuis Strapi ─────────────────────────────────────────────────

@@ -48,6 +48,8 @@ export default defineNuxtConfig({
         { name: 'robots', content: 'index, follow' },
         { property: 'og:type', content: 'website' },
         { property: 'og:site_name', content: 'Mairie de Bouaké' },
+        { property: 'og:locale', content: 'fr_CI' },
+        { name: 'twitter:card', content: 'summary_large_image' },
         { name: 'theme-color', content: '#009640' },
       ],
       link: [
@@ -75,15 +77,21 @@ export default defineNuxtConfig({
     strapiUrl:   process.env.STRAPI_URL   || 'http://localhost:1337',
     strapiToken: process.env.STRAPI_TOKEN || '',
     public: {
-      siteUrl:   process.env.SITE_URL  || 'https://mairie-bouake.ci',
+      // Adresse publique du site : sert aux liens canoniques, au partage et au sitemap
+      siteUrl:   process.env.SITE_URL  || 'https://www.mairiedebouake.ci',
       apiBase:   process.env.API_BASE  || '/api',
       strapiUrl: process.env.STRAPI_URL || 'http://localhost:1337',
+      // Balise Google (Analytics 4 / Tag Manager) — vide = aucune mesure
+      googleTagId: process.env.GOOGLE_TAG_ID || '',
+      // Code de validation Google Search Console (méthode « balise HTML »)
+      googleSiteVerification: process.env.GOOGLE_SITE_VERIFICATION || '',
     },
   },
 
   // ─── Plugins ──────────────────────────────────────────────────────────────
   plugins: [
     '~/plugins/bootstrap.client.ts',
+    '~/plugins/google-tag.client.ts',
   ],
 
   // ─── TypeScript ───────────────────────────────────────────────────────────

@@ -12,7 +12,34 @@ const projet = computed(() => projects.value?.[0] ?? null)
 useSeoMeta({
   title: () => projet.value?.title ?? 'Projet municipal',
   description: () => projet.value?.resume ?? projet.value?.description ?? 'Projet municipal de la ville de Bouaké.',
+  ogType: 'article',
+  ogTitle: () => projet.value?.title ?? 'Projet municipal',
+  ogDescription: () => projet.value?.resume ?? projet.value?.description ?? undefined,
+  ogImage: () => projet.value?.coverImage ?? undefined,
+  twitterImage: () => projet.value?.coverImage ?? undefined,
 })
+
+// Données structurées : projet présenté comme une action de la mairie
+const siteUrlSeo = String(useRuntimeConfig().public.siteUrl || '').replace(/\/$/, '')
+useHead(() => ({
+  script: projet.value
+    ? [{
+        type: 'application/ld+json',
+        innerHTML: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'Project',
+          name: projet.value.title,
+          description: projet.value.resume || projet.value.description || undefined,
+          image: projet.value.coverImage || undefined,
+          url: `${siteUrlSeo}/projets/${route.params.slug}`,
+          startDate: projet.value.dateDebut || undefined,
+          endDate: projet.value.dateFin || undefined,
+          funder: projet.value.bailleurs || projet.value.financement || undefined,
+          parentOrganization: { '@type': 'GovernmentOrganization', name: 'Mairie de Bouaké' },
+        }),
+      }]
+    : [],
+}))
 
 const formatDate = (date?: string | null) =>
   date ? new Date(date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' }) : ''

@@ -1,0 +1,10 @@
+# robots.txt — Mairie de Bouaké
+# Le site est public : tous les moteurs de recherche sont les bienvenus.
+
+User-agent: *
+Allow: /
+
+# Pages techniques sans intérêt pour la recherche
+Disallow: /api/
+
+Sitemap: https://www.mairiedebouake.ci/sitemap.xml

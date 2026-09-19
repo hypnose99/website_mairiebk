@@ -209,8 +209,47 @@ onUnmounted(() => window.removeEventListener('scroll', updateProgress))
 useSeoMeta({
   title: () => article.value?.title ?? 'Article',
   description: () => article.value?.excerpt,
+  // Partage sur les réseaux sociaux et WhatsApp
+  ogType: 'article',
+  ogTitle: () => article.value?.title ?? 'Article',
+  ogDescription: () => article.value?.excerpt,
   ogImage: () => article.value?.coverImage,
+  twitterTitle: () => article.value?.title ?? 'Article',
+  twitterDescription: () => article.value?.excerpt,
+  twitterImage: () => article.value?.coverImage,
+  articlePublishedTime: () => getArticleDate(article.value) ?? undefined,
+  articleSection: () => article.value?.categoryLabel ?? undefined,
 })
+
+// ── Données structurées : fiche « article de presse » pour Google ──────────
+// Permet l'affichage enrichi (date, image, auteur) dans les résultats et
+// l'éligibilité à Google Actualités.
+const siteUrlSeo = String(useRuntimeConfig().public.siteUrl || '').replace(/\/$/, '')
+useHead(() => ({
+  script: article.value
+    ? [{
+        type: 'application/ld+json',
+        innerHTML: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'NewsArticle',
+          headline: String(article.value.title ?? '').slice(0, 110),
+          description: article.value.excerpt ?? '',
+          image: article.value.coverImage ? [article.value.coverImage] : undefined,
+          datePublished: getArticleDate(article.value) ?? undefined,
+          dateModified: getArticleDate(article.value) ?? undefined,
+          articleSection: article.value.categoryLabel ?? undefined,
+          inLanguage: 'fr-CI',
+          mainEntityOfPage: `${siteUrlSeo}/actualites/${slug.value}`,
+          author: { '@type': 'Organization', name: article.value.author || 'Mairie de Bouaké' },
+          publisher: {
+            '@type': 'Organization',
+            name: 'Mairie de Bouaké',
+            logo: { '@type': 'ImageObject', url: `${siteUrlSeo}/images/logo.png` },
+          },
+        }),
+      }]
+    : [],
+}))
 </script>
 
 <template>

@@ -5,6 +5,28 @@ import { useAppStore } from '~/stores/useAppStore'
 
 const appStore = useAppStore()
 const { isOffline, activeNotifications } = storeToRefs(appStore)
+
+// ── Référencement : réglages valables sur toutes les pages ──────────────────
+// - lien canonique : une seule adresse officielle par page, pour éviter que
+//   Google considère /page et /page?utm=... comme deux pages différentes ;
+// - image de partage par défaut (réseaux sociaux, WhatsApp) ;
+// - code de validation Google Search Console, si la variable est renseignée.
+const route  = useRoute()
+const config = useRuntimeConfig().public
+const siteUrl = String(config.siteUrl || '').replace(/\/$/, '')
+
+const canonical = computed(() => `${siteUrl}${route.path === '/' ? '' : route.path}`)
+
+useHead(() => ({
+  link: [{ rel: 'canonical', href: canonical.value }],
+  meta: [
+    { property: 'og:url', content: canonical.value },
+    { property: 'og:image', content: `${siteUrl}/images/logo.png` },
+    ...(config.googleSiteVerification
+      ? [{ name: 'google-site-verification', content: String(config.googleSiteVerification) }]
+      : []),
+  ],
+}))
 </script>
 
 <template>

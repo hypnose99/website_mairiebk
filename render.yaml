@@ -73,3 +73,9 @@ services:
         sync: false
       - key: SITE_URL
         sync: false
+      # Balise Google (Analytics 4) — ex. G-XXXXXXXXXX
+      - key: GOOGLE_TAG_ID
+        sync: false
+      # Validation Google Search Console par balise HTML (facultatif)
+      - key: GOOGLE_SITE_VERIFICATION
+        sync: false
