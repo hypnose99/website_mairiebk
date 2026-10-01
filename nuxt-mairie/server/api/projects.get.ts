@@ -2,6 +2,7 @@
 import { strapiHeaders, transformProject } from '~/server/utils/strapi'
 import projectsData from '~/data/projects.json'
 import type { ProjectStatus } from '~/types'
+import { memoriser, reprendre } from '~/server/utils/secours'
 
 export default defineCachedEventHandler(async (event) => {
   const config = useRuntimeConfig()
@@ -41,27 +42,34 @@ export default defineCachedEventHandler(async (event) => {
       { headers: strapiHeaders() }
     )
 
-    return (response.data ?? []).map((item: any) =>
+    return memoriser(`api/projects:${event.path}`, (response.data ?? []).map((item: any) =>
       transformProject(item, config.strapiUrl)
-    )
+    ))
   }
-  catch {
-    // ── Fallback : données locales si Strapi indisponible ──
-    let results = [...projectsData]
-
-    if (query.status) {
-      results = results.filter(p => p.status === query.status as ProjectStatus)
+  catch (err: any) {
+    // Priorite a la derniere reponse valide de Strapi : les projets reels de la
+    // mairie valent mieux que le jeu local, qui ne sert que de dernier recours.
+    try {
+      return reprendre(`api/projects:${event.path}`, err?.statusCode ?? err?.message)
     }
-    if (query.search) {
-      const term = (query.search as string).toLowerCase()
-      results = results.filter(p =>
-        p.title.toLowerCase().includes(term) ||
-        p.description.toLowerCase().includes(term) ||
-        p.tags.some(t => t.includes(term))
-      )
-    }
+    catch {
+      // ── Dernier recours : données locales si Strapi n'a jamais repondu ──
+      let results = [...projectsData]
 
-    return results
+      if (query.status) {
+        results = results.filter(p => p.status === query.status as ProjectStatus)
+      }
+      if (query.search) {
+        const term = (query.search as string).toLowerCase()
+        results = results.filter(p =>
+          p.title.toLowerCase().includes(term) ||
+          p.description.toLowerCase().includes(term) ||
+          p.tags.some(t => t.includes(term))
+        )
+      }
+
+      return results
+    }
   }
 }, {
   // Mise en cache courte de la réponse.

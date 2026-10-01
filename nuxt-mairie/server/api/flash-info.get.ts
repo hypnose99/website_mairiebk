@@ -1,5 +1,6 @@
 // server/api/flash-info.get.ts — Flash infos actifs depuis Strapi 5
 import { strapiHeaders, transformFlashInfo } from '~/server/utils/strapi'
+import { memoriser, reprendre } from '~/server/utils/secours'
 
 export default defineCachedEventHandler(async (event) => {
   const config = useRuntimeConfig()
@@ -15,11 +16,10 @@ export default defineCachedEventHandler(async (event) => {
       { headers: strapiHeaders() }
     )
 
-    return (response.data ?? []).map(transformFlashInfo)
+    return memoriser('api/flash-info', (response.data ?? []).map(transformFlashInfo))
   }
   catch (err: any) {
-    console.error('[api/flash-info] Strapi error:', err?.statusCode ?? err?.message)
-    return []
+    return reprendre('api/flash-info', err?.statusCode ?? err?.message)
   }
 }, {
   // Mise en cache courte de la réponse.

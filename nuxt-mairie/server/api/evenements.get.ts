@@ -1,5 +1,6 @@
 // server/api/evenements.get.ts — Événements à venir depuis Strapi 5
 import { strapiHeaders, transformEvenement } from '~/server/utils/strapi'
+import { memoriser, reprendre } from '~/server/utils/secours'
 
 export default defineCachedEventHandler(async (event) => {
   const config = useRuntimeConfig()
@@ -17,14 +18,14 @@ export default defineCachedEventHandler(async (event) => {
       { headers: strapiHeaders() }
     )
 
-    return (response.data ?? []).map((item: any) =>
+    return memoriser('api/evenements', (response.data ?? []).map((item: any) =>
       transformEvenement(item, config.strapiUrl)
-    )
+    ))
   }
   catch (err: any) {
-    // Ne jamais faire tomber la page : on log et on renvoie une liste vide
-    console.error('[api/evenements] Strapi error:', err?.statusCode ?? err?.message)
-    return []
+    // Plutot qu'une liste vide (qui serait mise en cache et figerait la page
+    // plusieurs minutes), on ressert la derniere reponse valide.
+    return reprendre('api/evenements', err?.statusCode ?? err?.message)
   }
 }, {
   // Mise en cache courte de la réponse.

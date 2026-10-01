@@ -1,5 +1,6 @@
 // server/api/categories-actualites.get.ts — Catégories d'actualités depuis Strapi 5
 import { strapiHeaders } from '~/server/utils/strapi'
+import { memoriser, reprendre } from '~/server/utils/secours'
 
 export default defineCachedEventHandler(async (event) => {
   const config = useRuntimeConfig()
@@ -14,15 +15,14 @@ export default defineCachedEventHandler(async (event) => {
       { headers: strapiHeaders() }
     )
 
-    return (response.data ?? []).map((item: any) => ({
+    return memoriser('api/categories-actualites', (response.data ?? []).map((item: any) => ({
       value:  item.slug,
       label:  item.nom,
       accent: item.couleur,
-    }))
+    })))
   }
   catch (err: any) {
-    console.error('[api/categories-actualites] Strapi error:', err?.statusCode ?? err?.message)
-    return []
+    return reprendre('api/categories-actualites', err?.statusCode ?? err?.message)
   }
 }, {
   // Mise en cache courte de la réponse.

@@ -4,6 +4,7 @@
 // Le tri, les filtres et la pagination sont faits par Strapi : la réponse ne
 // dépend plus de la limite de 100 éléments par requête de l'API Strapi.
 import { strapiFetchRange, transformActualite } from '~/server/utils/strapi'
+import { memoriser, reprendre } from '~/server/utils/secours'
 
 /** Nombre maximum d'articles qu'un appel peut demander (garde-fou). */
 const MAX_PER_PAGE = 500
@@ -55,13 +56,12 @@ export default defineCachedEventHandler(async (event) => {
       result = result.map(({ content, gallery, ...card }: any) => card)
     }
 
-    return { items: result, total, page, perPage }
+    return memoriser(`api/actualites:${event.path}`, { items: result, total, page, perPage })
   }
   catch (err: any) {
-    // Ne jamais faire tomber la page : on log et on renvoie une liste vide
-    // (même comportement que /api/evenements et /api/flash-info)
-    console.error('[api/actualites] Strapi error:', err?.statusCode ?? err?.message)
-    return { items: [], total: 0, page, perPage }
+    // Plutot qu'une liste vide (qui serait mise en cache et figerait la page
+    // plusieurs minutes), on ressert la derniere reponse valide pour cette requete.
+    return reprendre(`api/actualites:${event.path}`, err?.statusCode ?? err?.message)
   }
 }, {
   // Mise en cache courte de la réponse.

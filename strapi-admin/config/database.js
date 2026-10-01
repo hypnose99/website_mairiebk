@@ -17,8 +17,25 @@ module.exports = ({ env }) => {
           : false,
         schema: 'public',
       },
-      pool: { min: 0, max: 10 },
-      acquireConnectionTimeout: 60000,
+      // Pool de connexions.
+      //
+      // Le pooler Supabase ferme les connexions restees inactives. Sans duree de
+      // vie ni recyclage, Knex garde ces connexions mortes dans son pool et finit
+      // par echouer sur "Timeout acquiring a connection. The pool is probably full".
+      //
+      // idleTimeoutMillis rend la connexion avant que le pooler la coupe ;
+      // reapIntervalMillis fait le menage regulierement ; les delais courts font
+      // remonter une vraie erreur au lieu d'attendre une minute.
+      pool: {
+        min: 0,
+        max: env.int('DATABASE_POOL_MAX', 5),
+        idleTimeoutMillis:   20000,
+        reapIntervalMillis:   5000,
+        createTimeoutMillis: 15000,
+        acquireTimeoutMillis: 20000,
+        propagateCreateError: false,
+      },
+      acquireConnectionTimeout: 20000,
     },
   };
 };
